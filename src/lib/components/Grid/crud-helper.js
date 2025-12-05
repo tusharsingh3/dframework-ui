@@ -110,7 +110,7 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
     if (isPortalController && contentType) {
         action = 'export';
     }
-    let url = isPortalController ? isDetailsExport ? `${apis.urlWithControllers}${api}` : `${apis.urlWithControllers}${api}?action=${action}&asArray=0` : `${apis.url}/${api}/${action}`;
+    let url = isPortalController ? isDetailsExport ? `${apis.urlWithControllers}${api}` : `${apis.urlWithControllers}${api}?action=${action}&asArray=0` : `${api}/${action}`;
 
     const isPivot = isPivotExport || isFieldStatusPivotExport || isInstallationPivotExport;
     if (isPortalController) {

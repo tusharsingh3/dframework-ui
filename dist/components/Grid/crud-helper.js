@@ -216,7 +216,7 @@ const getList = async _ref => {
   if (isPortalController && contentType) {
     action = 'export';
   }
-  let url = isPortalController ? isDetailsExport ? "".concat(apis.urlWithControllers).concat(api) : "".concat(apis.urlWithControllers).concat(api, "?action=").concat(action, "&asArray=0") : "".concat(apis.url, "/").concat(api, "/").concat(action);
+  let url = isPortalController ? isDetailsExport ? "".concat(apis.urlWithControllers).concat(api) : "".concat(apis.urlWithControllers).concat(api, "?action=").concat(action, "&asArray=0") : "".concat(api, "/").concat(action);
   const isPivot = isPivotExport || isFieldStatusPivotExport || isInstallationPivotExport;
   if (isPortalController) {
     _utils.default.createFiltersForPortalController(where, requestData);
