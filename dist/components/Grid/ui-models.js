@@ -65,9 +65,7 @@ class UiModel {
       return /*#__PURE__*/_react.default.createElement(_Paper.default, null, /*#__PURE__*/_react.default.createElement(_index.default, _extends({
         model: this,
         showRowsSelected: showRowsSelected
-      }, props, {
-        t: _utils.default.t
-      })));
+      }, props)));
     });
     _defineProperty(this, "ChildGrid", props => {
       return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_index.default, _extends({
