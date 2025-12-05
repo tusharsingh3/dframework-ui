@@ -60,10 +60,10 @@ const CustomToolbar = function (props) {
                     {effectivePermissions?.filter && <GridToolbarFilterButton />}
                     {effectivePermissions?.filter && <Button startIcon={<FilterListOffIcon />} onClick={clearFilters} size="small" sx={{ width: 'max-content' }}>{t("CLEAR FILTER", tOpts)}</Button>}
                     {effectivePermissions.export && (
-                        <CustomExportButton tTranslate={tTranslate} tOpts={tOpts} handleExport={handleExport} showPivotExportBtn={model?.showPivotExportBtn} showOnlyExcelExport={model.showOnlyExcelExport} />
+                        <CustomExportButton t={t} tOpts={tOpts} handleExport={handleExport} showPivotExportBtn={model?.showPivotExportBtn} showOnlyExcelExport={model.showOnlyExcelExport} />
                     )}
                     {model.preferenceId &&
-                       <GridPreferences tTranslate={tTranslate} gridRef={apiRef} columns={gridColumns} setIsGridPreferenceFetched={setIsGridPreferenceFetched} model={model} initialGridRef={initialGridRef} setIsLoading={setIsLoading} />
+                       <GridPreferences t={t} gridRef={apiRef} columns={gridColumns} setIsGridPreferenceFetched={setIsGridPreferenceFetched} model={model} initialGridRef={initialGridRef} setIsLoading={setIsLoading} />
                     }
                 </Box>
             </GridToolbarContainer>

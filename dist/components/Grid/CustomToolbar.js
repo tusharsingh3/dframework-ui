@@ -110,13 +110,13 @@ const CustomToolbar = function CustomToolbar(props) {
       width: 'max-content'
     }
   }, t("CLEAR FILTER", tOpts)), effectivePermissions.export && /*#__PURE__*/_react.default.createElement(CustomExportButton, {
-    tTranslate: tTranslate,
+    t: t,
     tOpts: tOpts,
     handleExport: handleExport,
     showPivotExportBtn: model === null || model === void 0 ? void 0 : model.showPivotExportBtn,
     showOnlyExcelExport: model.showOnlyExcelExport
   }), model.preferenceId && /*#__PURE__*/_react.default.createElement(_GridPreference.default, {
-    tTranslate: tTranslate,
+    t: t,
     gridRef: apiRef,
     columns: gridColumns,
     setIsGridPreferenceFetched: setIsGridPreferenceFetched,

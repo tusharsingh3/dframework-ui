@@ -162,7 +162,8 @@ ExportMenuItem.propTypes = {
 };
 const CustomExportButton = props => {
   const {
-    tOpts
+    tOpts,
+    t
   } = props;
   return /*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridToolbarExportContainer, props, (props === null || props === void 0 ? void 0 : props.showOnlyExcelExport) !== true && /*#__PURE__*/_react.default.createElement(ExportMenuItem, _extends({}, props, {
     icon: /*#__PURE__*/_react.default.createElement(_iconsMaterial.GridOn, {
@@ -181,35 +182,35 @@ const CustomExportButton = props => {
       fontSize: "small"
     }),
     onExportMenuClick: props.onExportMenuClick,
-    type: tOpts.t(props.detailExportLabel, tOpts) || tOpts.t("Excel with Details", tOpts),
+    type: t(props.detailExportLabel, tOpts) || t("Excel with Details", tOpts),
     contentType: _constants.default.exportTypes.EXCEL,
     isDetailsExport: true
   })), props.showExportWithLatestData && /*#__PURE__*/_react.default.createElement(ExportMenuItem, _extends({}, props, {
     icon: /*#__PURE__*/_react.default.createElement(_iconsMaterial.TableChart, {
       fontSize: "small"
     }),
-    type: tOpts.t("Excel with Latest Data", tOpts),
+    type: t("Excel with Latest Data", tOpts),
     contentType: _constants.default.exportTypes.EXCEL,
     isLatestExport: true
   })), props.showPivotExportBtn && /*#__PURE__*/_react.default.createElement(ExportMenuItem, _extends({}, props, {
     icon: /*#__PURE__*/_react.default.createElement(_iconsMaterial.TableChart, {
       fontSize: "small"
     }),
-    type: tOpts.t("Excel with Pivot", tOpts),
+    type: t("Excel with Pivot", tOpts),
     contentType: _constants.default.exportTypes.EXCEL,
     isPivotExport: true
   })), props.showInFieldStatusPivotExportBtn && /*#__PURE__*/_react.default.createElement(ExportMenuItem, _extends({}, props, {
     icon: /*#__PURE__*/_react.default.createElement(_iconsMaterial.TableChart, {
       fontSize: "small"
     }),
-    type: tOpts.t("Excel with In-field Pivot", tOpts),
+    type: t("Excel with In-field Pivot", tOpts),
     contentType: _constants.default.exportTypes.EXCEL,
     isFieldStatusPivotExport: true
   })), props.showInstallationPivotExportBtn && /*#__PURE__*/_react.default.createElement(ExportMenuItem, _extends({}, props, {
     icon: /*#__PURE__*/_react.default.createElement(_iconsMaterial.TableChart, {
       fontSize: "small"
     }),
-    type: tOpts.t("Excel with Installation Pivot", tOpts),
+    type: t("Excel with Installation Pivot", tOpts),
     contentType: _constants.default.exportTypes.EXCEL,
     isInstallationPivotExport: true
   })), (props === null || props === void 0 ? void 0 : props.showOnlyExcelExport) !== true && /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, props.hideXmlExport === false && /*#__PURE__*/_react.default.createElement(ExportMenuItem, _extends({}, props, {

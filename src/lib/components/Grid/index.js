@@ -103,16 +103,16 @@ ExportMenuItem.propTypes = {
 };
 
 const CustomExportButton = (props) => {
-    const { tOpts } = props;
+    const { tOpts, t } = props;
     return (
         <GridToolbarExportContainer {...props}>
             {props?.showOnlyExcelExport !== true && <ExportMenuItem {...props} icon={<GridOn fontSize="small" />} type="CSV" contentType={constants.exportTypes.CSV} />}
             {props.hideExcelExport === false && <ExportMenuItem {...props} icon={<TableChart fontSize="small" />} type="Excel" contentType={constants.exportTypes.EXCEL} />}
-            {props.showExportWithDetails && <ExportMenuItem {...props} icon={<TableChart fontSize="small" />} onExportMenuClick={props.onExportMenuClick} type={tOpts.t(props.detailExportLabel, tOpts) || tOpts.t("Excel with Details", tOpts)} contentType={constants.exportTypes.EXCEL} isDetailsExport={true} />}
-            {props.showExportWithLatestData && <ExportMenuItem {...props} icon={<TableChart fontSize="small" />} type={tOpts.t("Excel with Latest Data", tOpts)} contentType={constants.exportTypes.EXCEL} isLatestExport={true} />}
-            {props.showPivotExportBtn && <ExportMenuItem {...props} icon={<TableChart fontSize="small" />} type={tOpts.t("Excel with Pivot", tOpts)} contentType={constants.exportTypes.EXCEL} isPivotExport={true} />}
-            {props.showInFieldStatusPivotExportBtn && <ExportMenuItem {...props} icon={<TableChart fontSize="small" />} type={tOpts.t("Excel with In-field Pivot", tOpts)} contentType={constants.exportTypes.EXCEL} isFieldStatusPivotExport={true} />}
-            {props.showInstallationPivotExportBtn && <ExportMenuItem {...props} icon={<TableChart fontSize="small" />} type={tOpts.t("Excel with Installation Pivot", tOpts)} contentType={constants.exportTypes.EXCEL} isInstallationPivotExport={true} />}
+            {props.showExportWithDetails && <ExportMenuItem {...props} icon={<TableChart fontSize="small" />} onExportMenuClick={props.onExportMenuClick} type={t(props.detailExportLabel, tOpts) || t("Excel with Details", tOpts)} contentType={constants.exportTypes.EXCEL} isDetailsExport={true} />}
+            {props.showExportWithLatestData && <ExportMenuItem {...props} icon={<TableChart fontSize="small" />} type={t("Excel with Latest Data", tOpts)} contentType={constants.exportTypes.EXCEL} isLatestExport={true} />}
+            {props.showPivotExportBtn && <ExportMenuItem {...props} icon={<TableChart fontSize="small" />} type={t("Excel with Pivot", tOpts)} contentType={constants.exportTypes.EXCEL} isPivotExport={true} />}
+            {props.showInFieldStatusPivotExportBtn && <ExportMenuItem {...props} icon={<TableChart fontSize="small" />} type={t("Excel with In-field Pivot", tOpts)} contentType={constants.exportTypes.EXCEL} isFieldStatusPivotExport={true} />}
+            {props.showInstallationPivotExportBtn && <ExportMenuItem {...props} icon={<TableChart fontSize="small" />} type={t("Excel with Installation Pivot", tOpts)} contentType={constants.exportTypes.EXCEL} isInstallationPivotExport={true} />}
             {props?.showOnlyExcelExport !== true && <>
 
                 {props.hideXmlExport === false && <ExportMenuItem {...props} icon={<Code fontSize="small" />} type="XML" contentType="text/xml" />}

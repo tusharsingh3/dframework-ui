@@ -114,6 +114,7 @@ const getGridColumnsFromRef = _ref => {
 const GridPreferences = _ref2 => {
   var _stateData$gridSettin;
   let {
+    t,
     model,
     gridRef,
     columns = [],
@@ -469,9 +470,9 @@ const GridPreferences = _ref2 => {
     "aria-haspopup": "true",
     "aria-expanded": menuAnchorEl ? 'true' : undefined,
     onClick: handleOpen,
-    title: tTranslate('Preference', tOpts),
+    title: t('Preference', tOpts),
     startIcon: /*#__PURE__*/_react.default.createElement(_Settings.default, null)
-  }, tTranslate('Preferences', tOpts)), /*#__PURE__*/_react.default.createElement(_material.Menu, {
+  }, t('Preferences', tOpts)), /*#__PURE__*/_react.default.createElement(_material.Menu, {
     id: "grid-preference-menu",
     anchorEl: menuAnchorEl,
     open: !!menuAnchorEl,
@@ -500,12 +501,12 @@ const GridPreferences = _ref2 => {
     component: _material.ListItemButton,
     dense: true,
     onClick: () => openModal(formTypes.Add)
-  }, tTranslate('Add Preference', tOpts)), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
+  }, t('Add Preference', tOpts)), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
     component: _material.ListItemButton,
     dense: true,
     divider: (preferences === null || preferences === void 0 ? void 0 : preferences.length) > 0,
     onClick: () => openModal(formTypes.Manage, false)
-  }, tTranslate('Manage Preferences', tOpts)), (preferences === null || preferences === void 0 ? void 0 : preferences.length) > 0 && (preferences === null || preferences === void 0 ? void 0 : preferences.map((ele, key) => {
+  }, t('Manage Preferences', tOpts)), (preferences === null || preferences === void 0 ? void 0 : preferences.length) > 0 && (preferences === null || preferences === void 0 ? void 0 : preferences.map((ele, key) => {
     const {
       prefName,
       prefDesc,
@@ -515,10 +516,10 @@ const GridPreferences = _ref2 => {
       onClick: () => applySelectedPreference(prefId, key),
       component: _material.ListItem,
       key: "pref-item-".concat(key),
-      title: tTranslate(prefDesc, tOpts),
+      title: t(prefDesc, tOpts),
       dense: true
     }, /*#__PURE__*/_react.default.createElement(_material.ListItemText, {
-      primary: tTranslate(prefName, tOpts)
+      primary: t(prefName, tOpts)
     }));
   }))), /*#__PURE__*/_react.default.createElement(_material.Dialog, {
     open: openDialog,
@@ -534,7 +535,7 @@ const GridPreferences = _ref2 => {
     columnGap: 2
   }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
     variant: "h5"
-  }, formType, " ", tTranslate('Preference', tOpts)))), /*#__PURE__*/_react.default.createElement(_material.DialogContent, null, openForm && /*#__PURE__*/_react.default.createElement(_material.Grid, {
+  }, formType, " ", t('Preference', tOpts)))), /*#__PURE__*/_react.default.createElement(_material.DialogContent, null, openForm && /*#__PURE__*/_react.default.createElement(_material.Grid, {
     component: 'form',
     onSubmit: formik.handleSubmit,
     rowGap: 2,
@@ -551,11 +552,11 @@ const GridPreferences = _ref2 => {
     item: true,
     xs: 12
   }, /*#__PURE__*/_react.default.createElement(_material.TextField, {
-    defaultValue: tTranslate(formik.values.prefName, tOpts),
+    defaultValue: t(formik.values.prefName, tOpts),
     variant: "outlined",
     size: "small",
     margin: "dense",
-    label: tTranslate('Preference Name', tOpts),
+    label: t('Preference Name', tOpts),
     name: 'prefName',
     onChange: formik.handleChange,
     error: !!formik.errors.prefName,
@@ -566,13 +567,13 @@ const GridPreferences = _ref2 => {
     item: true,
     xs: 12
   }, /*#__PURE__*/_react.default.createElement(_material.TextField, {
-    defaultValue: tTranslate(formik.values.prefDesc, tOpts),
+    defaultValue: t(formik.values.prefDesc, tOpts),
     variant: "outlined",
     multiline: true,
     rows: 2,
     size: "small",
     margin: "dense",
-    label: tTranslate('Preference Description', tOpts),
+    label: t('Preference Description', tOpts),
     name: 'prefDesc',
     onChange: formik.handleChange,
     error: !!formik.errors.prefDesc,
@@ -587,7 +588,7 @@ const GridPreferences = _ref2 => {
       name: 'isDefault',
       onChange: formik.handleChange
     }),
-    label: tTranslate('Default', tOpts)
+    label: t('Default', tOpts)
   })), /*#__PURE__*/_react.default.createElement(_material.Grid, {
     item: true,
     xs: 12
@@ -604,7 +605,7 @@ const GridPreferences = _ref2 => {
     color: "primary",
     variant: "contained",
     disableElevation: true
-  }, tTranslate('Save', tOpts)), /*#__PURE__*/_react.default.createElement(_material.Button, {
+  }, t('Save', tOpts)), /*#__PURE__*/_react.default.createElement(_material.Button, {
     type: "button",
     startIcon: /*#__PURE__*/_react.default.createElement(_Close.default, null),
     color: "error",
@@ -612,7 +613,7 @@ const GridPreferences = _ref2 => {
     size: "small",
     onClick: handleDialogClose,
     disableElevation: true
-  }, tTranslate('Close', tOpts))))), openDialog && formType === formTypes.Manage && /*#__PURE__*/_react.default.createElement(_material.Grid, {
+  }, t('Close', tOpts))))), openDialog && formType === formTypes.Manage && /*#__PURE__*/_react.default.createElement(_material.Grid, {
     container: true
   }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
     item: true,
@@ -648,20 +649,20 @@ const GridPreferences = _ref2 => {
     disableRowSelectionOnClick: true,
     autoHeight: true,
     localeText: {
-      toolbarColumnsLabel: tTranslate('Select columns', tOpts),
-      toolbarExportLabel: tTranslate('Export', tOpts),
-      booleanCellFalseLabel: tTranslate('No', tOpts),
-      paginationRowsPerPage: tTranslate('Rows per page', tOpts),
+      toolbarColumnsLabel: t('Select columns', tOpts),
+      toolbarExportLabel: t('Export', tOpts),
+      booleanCellFalseLabel: t('No', tOpts),
+      paginationRowsPerPage: t('Rows per page', tOpts),
       paginationDisplayedRows: _ref5 => {
         let {
           from,
           to,
           count
         } = _ref5;
-        return "".concat(from, "\u2013").concat(to, " ").concat(tTranslate('of', tOpts), " ").concat(count);
+        return "".concat(from, "\u2013").concat(to, " ").concat(t('of', tOpts), " ").concat(count);
       },
-      toolbarQuickFilterLabel: tTranslate('Search', tOpts),
-      columnsManagementSearchTitle: tTranslate('Search', tOpts)
+      toolbarQuickFilterLabel: t('Search', tOpts),
+      columnsManagementSearchTitle: t('Search', tOpts)
     }
   })))), formType === formTypes.Manage && /*#__PURE__*/_react.default.createElement(_material.DialogActions, null, /*#__PURE__*/_react.default.createElement(_material.Button, {
     color: "error",
@@ -669,7 +670,7 @@ const GridPreferences = _ref2 => {
     size: "small",
     onClick: () => closeModal(),
     disableElevation: true
-  }, tTranslate('Close', tOpts)))), /*#__PURE__*/_react.default.createElement(_material.Dialog, {
+  }, t('Close', tOpts)))), /*#__PURE__*/_react.default.createElement(_material.Dialog, {
     open: openPreferenceExistsModal,
     maxWidth: "xs",
     fullWidth: true
@@ -677,7 +678,7 @@ const GridPreferences = _ref2 => {
     sx: {
       fontSize: '16px'
     }
-  }, "\"", prefName, "\" ", tTranslate('name already in use, please use another name.', tOpts)), /*#__PURE__*/_react.default.createElement(_material.DialogActions, {
+  }, "\"", prefName, "\" ", t('name already in use, please use another name.', tOpts)), /*#__PURE__*/_react.default.createElement(_material.DialogActions, {
     sx: {
       justifyContent: 'center',
       marginTop: '4%'
@@ -688,6 +689,6 @@ const GridPreferences = _ref2 => {
     size: "small",
     onClick: () => setOpenPreferenceExistsModal(false),
     disableElevation: true
-  }, tTranslate('Ok', tOpts)))));
+  }, t('Ok', tOpts)))));
 };
 var _default = exports.default = GridPreferences;
