@@ -212,15 +212,15 @@ const GridBase = memo(({
     const snackbar = useSnackbar();
     const isClient = model.isClient === true ? 'client' : 'server';
     const [errorMessage, setErrorMessage] = useState('');
-    const userData = useSelector(state => state.appReducer.userData);
-    const globalHeaderFilters = useSelector(state => state.appReducer.gridExternalFilters);
-    const { IsSuperAdmin, ClientIds: tagsClientIds = '' } = userData?.tags || {};
+    const userData = stateData?.getUserData ? stateData.getUserData : {};
+    const globalHeaderFilters = stateData?.gridExternalFilters ? stateData.gridExternalFilters : {}; 
+    const { IsSuperAdmin, ClientIds: tagsClientIds = '' } = stateData?.getUserData ? stateData.getUserData : {};
     const [sortModel, setSortModel] = useState(convertDefaultSort(defaultSort || model?.defaultSort));
     const [externalHeaderFilters, setExternalHeaderFilters] = useState(model?.initialHeaderFilters || {});
     const [headerFilters, setHeaderFilters] = useState(model?.initialHeaderFilterValues || []);
-    const groupBy = useSelector(state => state.appReducer.dataGroupBy);
+    const groupBy = stateData?.dataGroupBy;
     const prevFilterValues = React.useRef(globalHeaderFilters);
-    const filterValues = useSelector(state => state.appReducer.filterValues);
+    const filterValues = stateData?.filterValues;
     const [columnOrderModel, setColumnOrderModel] = useState([]);
     const [isDataFetchedInitially, setIsDataFetchedInitially] = useState(false)
     // State for single expanded detail panel row

@@ -344,18 +344,18 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   const snackbar = (0, _index.useSnackbar)();
   const isClient = model.isClient === true ? 'client' : 'server';
   const [errorMessage, setErrorMessage] = (0, _react.useState)('');
-  const userData = useSelector(state => state.appReducer.userData);
-  const globalHeaderFilters = useSelector(state => state.appReducer.gridExternalFilters);
+  const userData = stateData !== null && stateData !== void 0 && stateData.getUserData ? stateData.getUserData : {};
+  const globalHeaderFilters = stateData !== null && stateData !== void 0 && stateData.gridExternalFilters ? stateData.gridExternalFilters : {};
   const {
     IsSuperAdmin,
     ClientIds: tagsClientIds = ''
-  } = (userData === null || userData === void 0 ? void 0 : userData.tags) || {};
+  } = stateData !== null && stateData !== void 0 && stateData.getUserData ? stateData.getUserData : {};
   const [sortModel, setSortModel] = (0, _react.useState)(convertDefaultSort(defaultSort || (model === null || model === void 0 ? void 0 : model.defaultSort)));
   const [externalHeaderFilters, setExternalHeaderFilters] = (0, _react.useState)((model === null || model === void 0 ? void 0 : model.initialHeaderFilters) || {});
   const [headerFilters, setHeaderFilters] = (0, _react.useState)((model === null || model === void 0 ? void 0 : model.initialHeaderFilterValues) || []);
-  const groupBy = useSelector(state => state.appReducer.dataGroupBy);
+  const groupBy = stateData === null || stateData === void 0 ? void 0 : stateData.dataGroupBy;
   const prevFilterValues = _react.default.useRef(globalHeaderFilters);
-  const filterValues = useSelector(state => state.appReducer.filterValues);
+  const filterValues = stateData === null || stateData === void 0 ? void 0 : stateData.filterValues;
   const [columnOrderModel, setColumnOrderModel] = (0, _react.useState)([]);
   const [isDataFetchedInitially, setIsDataFetchedInitially] = (0, _react.useState)(false);
   // State for single expanded detail panel row
