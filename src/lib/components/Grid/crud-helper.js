@@ -1,10 +1,17 @@
 import actionsStateProvider from "../useRouter/actions";
+import utils from "../utils";
 import { transport, HTTP_STATUS_CODES } from "./httpRequest";
 import request from "./httpRequest";
 
 const dateDataTypes = ['date', 'dateTime'];
+let url = (window.location.host.indexOf("localhost") !== -1) ? '' : process.env.APP_HOST;
+let urlWithControllers = url + "/Controllers/"
+const apis = {
+    urlWithControllers,
+    url
+}
 
-const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sortModel, filterModel, api, parentFilters, action = 'export', setError, extraParams, contentType, columns, controllerType = 'node', template = null, configFileName = null, dispatch, showFullScreenLoader = false, oderStatusId = 0, history = null, modelConfig = null, baseFilters = null, isElasticExport, fromSelfServe = false, isDetailsExport = false, setFetchData = () => { }, selectedClients = [], isChildGrid = false, groupBy, isPivotExport = false, gridPivotFilter = [], activeClients, isLatestExport = false, payloadFilter = [], isFieldStatusPivotExport = false, isInstallationPivotExport = false, uiClientIds = '', globalFilters = {}, additionalFiltersForExport, setColumns, afterDataSet, setIsDataFetchedInitially, isDataFetchedInitially, exportFileName = null, t = null, tOpts = null, languageSelected }) => {
+const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sortModel, filterModel, api, parentFilters, action = 'export', setError, extraParams, contentType, columns, controllerType = 'node', template = null, configFileName = null, dispatch, showFullScreenLoader = false, oderStatusId = 0, history = null, modelConfig = null, baseFilters = null, isElasticExport, fromSelfServe = false, isDetailsExport = false, setFetchData = () => { }, selectedClients = [], isChildGrid = false, groupBy, isPivotExport = false, gridPivotFilter = [], activeClients, isLatestExport = false, payloadFilter = [], isFieldStatusPivotExport = false, isInstallationPivotExport = false, uiClientIds = '', globalFilters = {}, additionalFiltersForExport, setColumns, afterDataSet, setIsDataFetchedInitially, isDataFetchedInitially, exportFileName = null, t = null, tOpts = null, languageSelected, dispatchData }) => {
     if (!contentType) {
         setIsLoading(true);
         if (showFullScreenLoader) {

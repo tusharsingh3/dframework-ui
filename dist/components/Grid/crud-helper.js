@@ -33,6 +33,7 @@ require("core-js/modules/web.url-search-params.delete.js");
 require("core-js/modules/web.url-search-params.has.js");
 require("core-js/modules/web.url-search-params.size.js");
 var _actions = _interopRequireDefault(require("../useRouter/actions"));
+var _utils = _interopRequireDefault(require("../utils"));
 var _httpRequest = _interopRequireWildcard(require("./httpRequest"));
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
@@ -42,6 +43,12 @@ function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
 function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 const dateDataTypes = ['date', 'dateTime'];
+let url = window.location.host.indexOf("localhost") !== -1 ? '' : process.env.APP_HOST;
+let urlWithControllers = url + "/Controllers/";
+const apis = {
+  urlWithControllers,
+  url
+};
 const getList = async _ref => {
   var _filterModel$items;
   let {
@@ -92,7 +99,8 @@ const getList = async _ref => {
     exportFileName = null,
     t = null,
     tOpts = null,
-    languageSelected
+    languageSelected,
+    dispatchData
   } = _ref;
   if (!contentType) {
     setIsLoading(true);
@@ -211,7 +219,7 @@ const getList = async _ref => {
   let url = isPortalController ? isDetailsExport ? "".concat(apis.urlWithControllers).concat(api) : "".concat(apis.urlWithControllers).concat(api, "?action=").concat(action, "&asArray=0") : "".concat(apis.url, "/").concat(api, "/").concat(action);
   const isPivot = isPivotExport || isFieldStatusPivotExport || isInstallationPivotExport;
   if (isPortalController) {
-    utils.createFiltersForPortalController(where, requestData);
+    _utils.default.createFiltersForPortalController(where, requestData);
     if (payloadFilter !== null && payloadFilter !== void 0 && payloadFilter.length) {
       payloadFilter.map(ele => {
         requestData[ele.field] = ele.value;
@@ -253,12 +261,12 @@ const getList = async _ref => {
     if (isDetailsExport) {
       var _Object$keys;
       url = url + "?v=" + new Date() + '&' + 'forExport=true';
-      let filtersForExport = utils.createFilter(filterModel, true);
+      let filtersForExport = _utils.default.createFilter(filterModel, true);
       if (((_Object$keys = Object.keys(filtersForExport)) === null || _Object$keys === void 0 ? void 0 : _Object$keys.length) > 0 && params.title !== constants.surveyInboxTitle) {
         filtersForExport.map(item => {
           if (item !== null && item !== void 0 && item.operatorValue) {
             if (item.isValueADate) {
-              let operatorId = utils.dateOperator[item === null || item === void 0 ? void 0 : item.operatorValue];
+              let operatorId = _utils.default.dateOperator[item === null || item === void 0 ? void 0 : item.operatorValue];
               if ((operatorId === null || operatorId === void 0 ? void 0 : operatorId.length) > 0) {
                 params.OperatorId = operatorId;
               }
@@ -275,7 +283,7 @@ const getList = async _ref => {
         for (const i in where) {
           where[i] = {
             "fieldName": where[i].field,
-            "operatorId": utils.filterType[where[i].operator],
+            "operatorId": _utils.default.filterType[where[i].operator],
             "convert": false,
             "values": [where[i].value]
           };
@@ -289,13 +297,13 @@ const getList = async _ref => {
           if (firstFilter) {
             firstFilter = {
               "fieldName": firstFilter.field,
-              "operatorId": utils.filterType[firstFilter.operator],
+              "operatorId": _utils.default.filterType[firstFilter.operator],
               "convert": false,
               "values": [firstFilter.value]
             };
           }
-          exportFilters = utils.createFilter(filterModel);
-          exportFilters = utils.addToFilter(firstFilter, exportFilters, filterModelCopy === null || filterModelCopy === void 0 ? void 0 : filterModelCopy.logicOperator.toUpperCase());
+          exportFilters = _utils.default.createFilter(filterModel);
+          exportFilters = _utils.default.addToFilter(firstFilter, exportFilters, filterModelCopy === null || filterModelCopy === void 0 ? void 0 : filterModelCopy.logicOperator.toUpperCase());
         }
       }
       params['filter'] = ((_Object$keys2 = Object.keys(exportFilters)) === null || _Object$keys2 === void 0 ? void 0 : _Object$keys2.length) > 0 ? Object.assign({}, exportFilters) : where[0] || '';
@@ -436,7 +444,7 @@ const getList = async _ref => {
                 };
               }
               if (col.key && !col.addDrillDownIcon) {
-                col.label = utils.formatMerchandisingDateRange(col.label);
+                col.label = _utils.default.formatMerchandisingDateRange(col.label);
               }
               return col;
             });

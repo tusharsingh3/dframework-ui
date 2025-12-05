@@ -408,7 +408,8 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     hideXmlExport = false,
     hideHtmlExport = false,
     hideJsonExport = false,
-    disableRowGrouping = true
+    disableRowGrouping = true,
+    applyDefaultClientFilter = true
   } = model;
   const isReadOnly = model.readOnly === true;
   const isDoubleClicked = model.doubleClicked === false;
@@ -1046,7 +1047,8 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       exportFileName: t((model === null || model === void 0 ? void 0 : model.exportFileName) || (model === null || model === void 0 ? void 0 : model.title), tOpts),
       t,
       tOpts,
-      languageSelected: _constants.default.supportedLanguageCodes[i18n.language || _constants.default.defaultLanguage]
+      languageSelected: _constants.default.supportedLanguageCodes[i18n.language || _constants.default.defaultLanguage],
+      dispatchData
     });
   };
   const openForm = function openForm(id) {
