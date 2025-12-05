@@ -4,9 +4,7 @@ import request from "./httpRequest";
 
 const dateDataTypes = ['date', 'dateTime'];
 
-const exportRecordSize = 10000;
-
-const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sortModel, filterModel, api, parentFilters, action = 'list', setError, extraParams, contentType, columns, controllerType = 'node', template = null, configFileName = null, dispatchData, showFullScreenLoader = false, oderStatusId = 0, modelConfig = null, baseFilters = null, isElasticExport, tTranslate = null, tOpts = null}) => {
+const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sortModel, filterModel, api, parentFilters, action = 'export', setError, extraParams, contentType, columns, controllerType = 'node', template = null, configFileName = null, dispatch, showFullScreenLoader = false, oderStatusId = 0, history = null, modelConfig = null, baseFilters = null, isElasticExport, fromSelfServe = false, isDetailsExport = false, setFetchData = () => { }, selectedClients = [], isChildGrid = false, groupBy, isPivotExport = false, gridPivotFilter = [], activeClients, isLatestExport = false, payloadFilter = [], isFieldStatusPivotExport = false, isInstallationPivotExport = false, uiClientIds = '', globalFilters = {}, additionalFiltersForExport, setColumns, afterDataSet, setIsDataFetchedInitially, isDataFetchedInitially, exportFileName = null, t = null, tOpts = null, languageSelected }) => {
     if (!contentType) {
         setIsLoading(true);
         if (showFullScreenLoader) {
@@ -14,9 +12,14 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
         }
     }
 
+    let isPortalController = controllerType === 'cs';
+    if (fromSelfServe) {
+        isPortalController = false;
+        api = modelConfig?.selfServerAPI || api;
+    }
     const lookups = [];
     const dateColumns = [];
-    gridColumns.forEach(({ lookup, type, field, keepLocal = false, keepLocalDate }) => {
+    gridColumns.forEach(({ lookup, type, field, keepLocal = false, keepLocalDate, keepUTC = false }) => {
         if (dateDataTypes.includes(type)) {
             dateColumns.push({ field, keepLocal, keepLocalDate });
         }
@@ -35,9 +38,14 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
                 const { field, operator, filterField } = filter;
                 let { value } = filter;
                 const column = gridColumns.filter((item) => item.field === filter.field);
-                const type = column[0]?.type;
+                let type = filter?.type || column[0]?.type;
+                const sqlType = column[0]?.sqlType;
                 if (type === 'boolean') {
-                    value = Boolean(value) ? 1 : 0;
+                    if (isPortalController) {
+                        value = typeof value === 'string' ? (value === 'true') : value;
+                    } else {
+                        value = Boolean(value) ? 1 : 0;
+                    }
                 } else if (type === 'number') {
                     value = Array.isArray(value) ? value.filter(e => e) : value;
                 }
@@ -46,7 +54,8 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
                     field: filterField || field,
                     operator: operator,
                     value: value,
-                    type: type
+                    type: type,
+                    sqlType: sqlType
                 });
             }
         });
@@ -65,9 +74,15 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
         logicalOperator: filterModel.logicOperator,
         sort: sortModel.map(sort => (sort.filterField || sort.field) + ' ' + sort.sort).join(','),
         where,
+        selectedClients,
         oderStatusId: oderStatusId,
         isElasticExport,
-        fileName: tTranslate(modelConfig?.overrideFileName, tOpts)
+        fileName: t(exportFileName || modelConfig?.title || modelConfig?.overrideFileName, tOpts),
+        fromSelfServe,
+        isChildGrid,
+        groupBy,
+        isLatestExport,
+        globalFilters
     };
 
     if (lookups) {
@@ -77,9 +92,33 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
     if (modelConfig?.limitToSurveyed) {
         requestData.limitToSurveyed = modelConfig?.limitToSurveyed
     }
+    if (modelConfig?.includeColumns) {
+        requestData.columns = gridColumns;
+    }
+    if (modelConfig?.gridType) {
+        requestData.gridType = modelConfig.gridType
+    }
 
     const headers = {};
-    let url = controllerType === 'cs' ? `${api}?action=${action}&asArray=0` : `${api}/${action}`;
+    if (isPortalController && contentType) {
+        action = 'export';
+    }
+    let url = isPortalController ? isDetailsExport ? `${apis.urlWithControllers}${api}` : `${apis.urlWithControllers}${api}?action=${action}&asArray=0` : `${apis.url}/${api}/${action}`;
+
+    const isPivot = isPivotExport || isFieldStatusPivotExport || isInstallationPivotExport;
+    if (isPortalController) {
+        utils.createFiltersForPortalController(where, requestData);
+        if (payloadFilter?.length) {
+            payloadFilter.map((ele) => {
+                requestData[ele.field] = ele.value;
+            })
+        }
+
+        if (sortModel?.length) {
+            requestData.sort = sortModel[0].field;
+            requestData.dir = sortModel[0].sort;
+        }
+    }
 
     if (template !== null) {
         url += `&template=${template}`;
@@ -87,16 +126,129 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
     if (configFileName !== null) {
         url += `&configFileName=${configFileName}`;
     }
+    if (isPivot) {
+        url += `&uiClientIds=${uiClientIds}`;
+        if (isPortalController && exportFileName) {
+            url += `&exportFileName=${exportFileName}`;
+        }
+    }
+
+    if (modelConfig?.customApi) {
+        url = modelConfig?.customApi
+    }
+    
+    let params = {
+        exportFileName: t(exportFileName || modelConfig?.title || modelConfig?.overrideFileName, tOpts),
+        action,
+        exportFormat: 'XLSX',
+        title: modelConfig?.pageTitle,
+        sort: sortModel.map(sort => (sort.filterField || sort.field) + ' ' + sort.sort).join(','),
+        TimeOffSet: new Date().getTimezoneOffset()
+    }
+    if (isDetailsExport && additionalFiltersForExport) {
+        requestData['additionalFiltersForExport'] = additionalFiltersForExport;
+        params['additionalFiltersForExport'] = additionalFiltersForExport;
+    }
+
     if (contentType) {
+        if (isDetailsExport) {
+            url = url + "?v=" + new Date() + '&' + 'forExport=true';
+            let filtersForExport = utils.createFilter(filterModel, true);
+            if (Object.keys(filtersForExport)?.length > 0 && params.title !== constants.surveyInboxTitle) {
+                filtersForExport.map((item) => {
+                    if (item?.operatorValue) {
+                        if (item.isValueADate) {
+                            let operatorId = utils.dateOperator[item?.operatorValue];
+                            if (operatorId?.length > 0) {
+                                params.OperatorId = operatorId;
+                            }
+                        }
+                    }
+                    params = { ...params, ...item };
+                })
+            }
+
+        }
+        if (where?.length && modelConfig?.convertFiltersToPortalFormat) {
+            let exportFilters = {};
+            if (where?.length <= 1) {
+                for (const i in where) {
+                    where[i] = {
+                        "fieldName": where[i].field,
+                        "operatorId": utils.filterType[where[i].operator],
+                        "convert": false,
+                        "values": [where[i].value]
+                    }
+                }
+            } else {
+                const filterModelCopy = filterModel;
+                let firstFilter = where[0];
+                if (filterModelCopy?.items?.length > 1 && firstFilter) {
+                    filterModelCopy.items = where;
+                    if (firstFilter) {
+                        firstFilter = {
+                            "fieldName": firstFilter.field,
+                            "operatorId": utils.filterType[firstFilter.operator],
+                            "convert": false,
+                            "values": [firstFilter.value]
+                        }
+                    }
+                    exportFilters = utils.createFilter(filterModel);
+                    exportFilters = utils.addToFilter(firstFilter, exportFilters, filterModelCopy?.logicOperator.toUpperCase());
+                }
+
+            }
+            params['filter'] = Object.keys(exportFilters)?.length > 0 ? Object.assign({}, exportFilters) : where[0] || '';
+        }
         const form = document.createElement("form");
         requestData.responseType = contentType;
         requestData.columns = columns;
+        if (isPortalController) {
+            requestData.exportFormat = constants.contentTypeToFileType[contentType];
+            requestData.selectedFields = Object.keys(columns).join();
+            if (requestData.sort && !Object.keys(columns).includes(requestData.sort)) {
+                requestData.selectedFields += `,${requestData.sort}`;
+            }
+            requestData.cols = Object.keys(columns).map(col => {
+                return { ColumnName: columns[col].field, Header: columns[col].headerName, Width: columns[col].width }
+            });
+            delete requestData.columns;
+            delete requestData.responseType;
+        }
+        requestData.userTimezoneOffset = new Date().getTimezoneOffset() * -1;
+        requestData.languageSelected = languageSelected;
         form.setAttribute("method", "POST");
         form.setAttribute("id", "exportForm");
-        form.setAttribute("target", "_blank")
+        form.setAttribute("target", "_blank");
+        let arr = isDetailsExport && action === 'export' ? params : requestData;
+        arr['isDetailsExport'] = isDetailsExport;
+        if (isPivot && gridPivotFilter?.length) { // When gridPivotFilter are passed and export is for pivot, apply gridPivotFilter filters as well
+            for (const item of gridPivotFilter) {
+                let v = item.value;
+                if (v === undefined || v === null) {
+                    continue;
+                } else if (typeof v !== 'string') {
+                    v = JSON.stringify(v);
+                }
+                let hiddenTag = document.createElement('input');
+                hiddenTag.type = "hidden";
+                hiddenTag.name = item.field;
+                hiddenTag.value = v;
+                form.append(hiddenTag);
+            }
+        }
+
+        if (modelConfig?.addSelectedClientsForExport) {
+            let hiddenTag = document.createElement('input');
+            hiddenTag.type = "hidden";
+            hiddenTag.name = "activeClients";
+            hiddenTag.value = activeClients.toString();
+            form.append(hiddenTag);
+        }
+
         if (template === null) {
-            for (const key in requestData) {
-                let v = requestData[key];
+            for (const key in arr) {
+                let v = arr[key];
                 if (v === undefined || v === null) {
                     continue;
                 } else if (typeof v !== 'string') {
@@ -128,43 +280,80 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
             },
             credentials: 'include'
         };
-
-        const response = await transport(params);
-        function isLocalTime(dateValue) {
-            const date = new Date(dateValue);
-            const localOffset = new Date().getTimezoneOffset();
-            const dateOffset = date.getTimezoneOffset();
-            return localOffset === dateOffset;
-        }
-        if (response.status === HTTP_STATUS_CODES.OK) {
-            const { records, userCurrencySymbol } = response.data;
-            if (records) {
-                records.forEach(record => {
-                    if (record.hasOwnProperty("TotalOrder")) {
-                        record["TotalOrder"] = `${userCurrencySymbol}${record["TotalOrder"]}`;
-                    }
-                    dateColumns.forEach(column => {
-                        const { field, keepLocal, keepLocalDate } = column;
-                        if (record[field]) {
-                            record[field] = new Date(record[field]);
-                            if (keepLocalDate) {
-                                const userTimezoneOffset = record[field].getTimezoneOffset() * 60000;
-                                record[field] = new Date(record[field].getTime() + userTimezoneOffset);
-                            }
-                            if (keepLocal && !isLocalTime(record[field])) {
-                                const userTimezoneOffset = record[field].getTimezoneOffset() * 60000;
-                                record[field] = new Date(record[field].getTime() + userTimezoneOffset);
-                            }
-                        }
-                    });
-                });
-            }
-            setData(response.data);
+        let response;
+        if (isPortalController) {
+            response = await request({ url, params: requestData, history, dispatch });
+            setData(response);
         } else {
-            setError(response.statusText);
+            response = await transport(params);
+            if (response.status === HTTP_STATUS_CODES.OK) {
+                const { records, userCurrencySymbol } = response.data;
+                if (records) {
+                    records.forEach(record => {
+                        if (record.hasOwnProperty("TotalOrder")) {
+                            record["TotalOrder"] = `${userCurrencySymbol}${record["TotalOrder"]}`;
+                        }
+                        dateColumns.forEach(column => {
+                            const { field, keepUTC } = column;
+                            if (record[field]) {
+                                record[field] = keepUTC ? dayjs.utc(record[field]) : new Date(record[field]);
+                            }
+                        });
+                    });
+                }
+                if (modelConfig?.dynamicColumns && setColumns) {
+                    const existingLabels = new Set(gridColumns?.map(col => col.label));
+                    const dynamicResponseColumns = response.data?.dynamicColumns || [];
+                    const isMerchandisingColumn = dynamicResponseColumns?.every(col => col.key);
+                    let newDynamicColumns;
+                    if (isMerchandisingColumn) {
+                        newDynamicColumns = dynamicResponseColumns?.filter(col => !existingLabels.has(col.key));
+                        existingLabels.clear();
+                        newDynamicColumns = newDynamicColumns.map(col => {
+                            if (col.addDrillDownIcon) {
+                                col.renderCell = (params) => {
+                                    return (
+                                        <IconButton
+                                            onClick={(e) => modelConfig.onDrillDown(params, col)}
+                                            size="small"
+                                            style={{ padding: 1 }}
+                                        >
+                                            <AddIcon />
+                                        </IconButton>
+                                    );
+                                };
+                            }
+                            if (col.key && !col.addDrillDownIcon) {
+                                col.label = utils.formatMerchandisingDateRange(col.label);
+                            }
+                            return col;
+                        });
+                    } else {
+                        if (modelConfig.updateDynamicColumns) {
+                            newDynamicColumns = modelConfig.updateDynamicColumns({ dynamicResponseColumns, t, tOpts });
+                        }
+                    }
+                    if (newDynamicColumns.length) {
+                        setColumns([...modelConfig.columns, ...newDynamicColumns]);
+                    }
+                }
+                setData(response.data);
+                if (setFetchData)
+                    setFetchData(true);
+                if (afterDataSet && !isDataFetchedInitially) {
+                    afterDataSet();
+                    setIsDataFetchedInitially(true);
+                }
+            } else {
+                setError(response.statusText);
+            }
         }
     } catch (err) {
-        setError(err);
+        let errorMessage = err;
+        if (t && tOpts) {
+            errorMessage = t(err.message, tOpts);
+        }
+        setError(errorMessage);
     } finally {
         if (!contentType) {
             setIsLoading(false);
@@ -177,7 +366,8 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
 
 const getRecord = async ({ api, id, setIsLoading, setActiveRecord, modelConfig, parentFilters, where = {}, setError }) => {
     api = api || modelConfig?.api
-    setIsLoading(true);
+    setIsLoading(!modelConfig?.overrideLoaderOnInitialRender);
+
     const searchParams = new URLSearchParams();
     const url = `${api}/${id === undefined || id === null ? '-' : id}`;
     const lookupsToFetch = [];
@@ -228,10 +418,10 @@ const getRecord = async ({ api, id, setIsLoading, setActiveRecord, modelConfig, 
     }
 };
 
-const deleteRecord = async function ({ id, api, setIsLoading, setError, setErrorMessage }) {
+const deleteRecord = async function ({ id, api, setIsLoading, setError, setErrorMessage, t, tOpts }) {
     let result = { success: false, error: '' };
     if (!id) {
-        setError('Deleted failed. No active record.');
+        setError(t('Deleted failed. No active record', tOpts));
         return;
     }
     setIsLoading(true);
@@ -246,24 +436,24 @@ const deleteRecord = async function ({ id, api, setIsLoading, setError, setError
             return true;
         }
         if (response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
-            setError('Session Expired!');
+            setError(t('Session Expired!', tOpts));
             setTimeout(() => {
                 window.location.href = '/';
             }, 2000);
         } else {
-            setError('Delete failed', response.body);
+            setError(t('Delete failed', tOpts), t(response.body, tOpts));
         }
     } catch (error) {
         const errorMessage = error?.response?.data?.error;
         result.error = errorMessage;
-        setErrorMessage(errorMessage);
+        setErrorMessage(t(errorMessage, tOpts));
     } finally {
         setIsLoading(false);
     }
     return result;
 };
 
-const saveRecord = async function ({ id, api, values, setIsLoading, setError }) {
+const saveRecord = async function ({ id, api, values, setIsLoading, setError, t, tOpts }) {
     let url, method;
 
     if (id !== 0) {
@@ -291,19 +481,19 @@ const saveRecord = async function ({ id, api, values, setIsLoading, setError }) 
             if (data.success) {
                 return data;
             }
-            setError('Save failed', data.err || data.message);
+            setError(t('Save failed', tOpts), t(data.err || data.message, tOpts));
             return;
         }
         if (response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
-            setError('Session Expired!');
+            setError(t('Session Expired!', tOpts));
             setTimeout(() => {
                 window.location.href = '/';
             }, 2000);
         } else {
-            setError('Save failed', response.body);
+            setError(t('Save failed', tOpts), t(response.body, tOpts));
         }
     } catch (error) {
-        setError('Save failed', error);
+        setError(t('Save failed', tOpts), t(error, tOpts));
     } finally {
         setIsLoading(false);
     }
