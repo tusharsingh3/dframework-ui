@@ -404,7 +404,8 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     hideExcelExport = false,
     hideXmlExport = false,
     hideHtmlExport = false,
-    hideJsonExport = false
+    hideJsonExport = false,
+    disableRowGrouping = true
   } = model;
   const isReadOnly = model.readOnly === true;
   const isDoubleClicked = model.doubleClicked === false;
