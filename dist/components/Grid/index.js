@@ -40,6 +40,7 @@ var _xDataGridPremium = require("@mui/x-data-grid-premium");
 var _Delete = _interopRequireDefault(require("@mui/icons-material/Delete"));
 var _FileCopy = _interopRequireDefault(require("@mui/icons-material/FileCopy"));
 var _Edit = _interopRequireDefault(require("@mui/icons-material/Edit"));
+var _Handyman = _interopRequireDefault(require("@mui/icons-material/Handyman"));
 var _MenuItem = _interopRequireDefault(require("@mui/material/MenuItem"));
 var _index = require("../SnackBar/index");
 var _index2 = require("../Dialog/index");
@@ -306,7 +307,6 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     isClientSelected = true,
     makeExternalRequest,
     afterDataSet,
-    customApplyFunction,
     onDataLoaded,
     rowSelectionModel = undefined
   } = _ref2;
@@ -422,6 +422,8 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   } = stateData !== null && stateData !== void 0 && stateData.getUserData ? stateData.getUserData : {};
   const routesWithNoChildRoute = ((_stateData$gridSettin = stateData.gridSettings.permissions) === null || _stateData$gridSettin === void 0 ? void 0 : _stateData$gridSettin.routesWithNoChildRoute) || [];
   const disablePivoting = !enablePivoting;
+  const globalSort = globalHeaderFilters !== null && globalHeaderFilters !== void 0 && globalHeaderFilters.length ? globalHeaderFilters === null || globalHeaderFilters === void 0 ? void 0 : globalHeaderFilters.filter(ele => ele.isGlobalSort) : [];
+  const rowGroupBy = globalSort !== null && globalSort !== void 0 && globalSort.length ? [globalSort[0].field] : [''];
   const url = stateData === null || stateData === void 0 || (_stateData$gridSettin2 = stateData.gridSettings) === null || _stateData$gridSettin2 === void 0 || (_stateData$gridSettin2 = _stateData$gridSettin2.permissions) === null || _stateData$gridSettin2 === void 0 ? void 0 : _stateData$gridSettin2.Url;
   const withControllersUrl = stateData === null || stateData === void 0 || (_stateData$gridSettin3 = stateData.gridSettings) === null || _stateData$gridSettin3 === void 0 || (_stateData$gridSettin3 = _stateData$gridSettin3.permissions) === null || _stateData$gridSettin3 === void 0 ? void 0 : _stateData$gridSettin3.withControllersUrl;
   const currentPreference = stateData === null || stateData === void 0 ? void 0 : stateData.currentPreference;
@@ -606,7 +608,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       }
       if (column.type === 'decimal') {
         overrides.align = column.align || 'right'; //  Since MUI aligns decimal field to left by default, so we've added this code to align it to right. If the align is passed to the column, it will override this.
-        const newFilterOperator = [...getGridNumericOperators()].filter(op => !['!='].includes(op.value));
+        const newFilterOperator = [...(0, _xDataGridPremium.getGridNumericOperators)()].filter(op => !['!='].includes(op.value));
         overrides.filterOperators = newFilterOperator;
       }
       if (gridColumnTypes[column.type]) {
@@ -719,7 +721,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
                 key: "resolve",
                 icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
                   title: t("Resolve", tOpts)
-                }, /*#__PURE__*/_react.default.createElement(HandymanIcon, {
+                }, /*#__PURE__*/_react.default.createElement(_Handyman.default, {
                   fontSize: "medium"
                 })),
                 label: "Resolve",

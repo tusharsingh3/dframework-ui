@@ -6,14 +6,14 @@ import {
     getGridDateOperators,
     GRID_CHECKBOX_SELECTION_COL_DEF,
     getGridStringOperators,
+    getGridNumericOperators,
+    GridActionsCellItem,
+    useGridApiRef
 } from '@mui/x-data-grid-premium';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CopyIcon from '@mui/icons-material/FileCopy';
 import EditIcon from '@mui/icons-material/Edit';
-import {
-    GridActionsCellItem,
-    useGridApiRef
-} from '@mui/x-data-grid-premium';
+import HandymanIcon from '@mui/icons-material/Handyman';
 import { useMemo, useEffect, memo, useRef, useState } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import { useSnackbar } from '../SnackBar/index';
@@ -186,7 +186,6 @@ const GridBase = memo(({
     isClientSelected = true,
     makeExternalRequest,
     afterDataSet,
-    customApplyFunction,
     onDataLoaded,
     rowSelectionModel = undefined
 }) => {
@@ -258,6 +257,8 @@ const GridBase = memo(({
     const { Username } = stateData?.getUserData ? stateData.getUserData : {};
     const routesWithNoChildRoute = stateData.gridSettings.permissions?.routesWithNoChildRoute || [];
     const disablePivoting = !enablePivoting;
+    const globalSort = globalHeaderFilters?.length ? globalHeaderFilters?.filter(ele => ele.isGlobalSort) : [];
+    const rowGroupBy = globalSort?.length ? [globalSort[0].field] : [''];
     const url = stateData?.gridSettings?.permissions?.Url;
     const withControllersUrl = stateData?.gridSettings?.permissions?.withControllersUrl;
     const currentPreference = stateData?.currentPreference;

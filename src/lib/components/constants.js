@@ -22,7 +22,8 @@ const constants = {
         "pt-PT": "Portuguese",
         "it-IT": "Italian",
         "ru-RU": "Russian"
-    }
+    },
+    ShowCustomActions: [9, 58]
 }
 
 export default constants;

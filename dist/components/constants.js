@@ -39,6 +39,7 @@ const constants = {
     "pt-PT": "Portuguese",
     "it-IT": "Italian",
     "ru-RU": "Russian"
-  }
+  },
+  ShowCustomActions: [9, 58]
 };
 var _default = exports.default = constants;
