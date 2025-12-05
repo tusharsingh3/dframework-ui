@@ -34,7 +34,11 @@ require("core-js/modules/web.url-search-params.has.js");
 require("core-js/modules/web.url-search-params.size.js");
 var _actions = _interopRequireDefault(require("../useRouter/actions"));
 var _utils = _interopRequireDefault(require("../utils"));
+var _constants = _interopRequireDefault(require("../constants"));
 var _httpRequest = _interopRequireWildcard(require("./httpRequest"));
+var _dayjs = _interopRequireDefault(require("dayjs"));
+var _core = require("@material-ui/core");
+var _Add = _interopRequireDefault(require("@material-ui/icons/Add"));
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
@@ -131,7 +135,8 @@ const getList = async _ref => {
       dateColumns.push({
         field,
         keepLocal,
-        keepLocalDate
+        keepLocalDate,
+        keepUTC
       });
     }
     if (!lookup) {
@@ -185,7 +190,7 @@ const getList = async _ref => {
   }
   const requestData = _objectSpread(_objectSpread({
     start: page * pageSize,
-    limit: isElasticExport ? modelConfig.exportSize : pageSize
+    limit: modelConfig !== null && modelConfig !== void 0 && modelConfig.isClient ? 0 : isElasticExport ? modelConfig.exportSize : pageSize
   }, extraParams), {}, {
     logicalOperator: filterModel.logicOperator,
     sort: sortModel.map(sort => (sort.filterField || sort.field) + ' ' + sort.sort).join(','),
@@ -262,7 +267,7 @@ const getList = async _ref => {
       var _Object$keys;
       url = url + "?v=" + new Date() + '&' + 'forExport=true';
       let filtersForExport = _utils.default.createFilter(filterModel, true);
-      if (((_Object$keys = Object.keys(filtersForExport)) === null || _Object$keys === void 0 ? void 0 : _Object$keys.length) > 0 && params.title !== constants.surveyInboxTitle) {
+      if (((_Object$keys = Object.keys(filtersForExport)) === null || _Object$keys === void 0 ? void 0 : _Object$keys.length) > 0 && params.title !== _constants.default.surveyInboxTitle) {
         filtersForExport.map(item => {
           if (item !== null && item !== void 0 && item.operatorValue) {
             if (item.isValueADate) {
@@ -312,7 +317,7 @@ const getList = async _ref => {
     requestData.responseType = contentType;
     requestData.columns = columns;
     if (isPortalController) {
-      requestData.exportFormat = constants.contentTypeToFileType[contentType];
+      requestData.exportFormat = _constants.default.contentTypeToFileType[contentType];
       requestData.selectedFields = Object.keys(columns).join();
       if (requestData.sort && !Object.keys(columns).includes(requestData.sort)) {
         requestData.selectedFields += ",".concat(requestData.sort);
@@ -417,7 +422,7 @@ const getList = async _ref => {
                 keepUTC
               } = column;
               if (record[field]) {
-                record[field] = keepUTC ? dayjs.utc(record[field]) : new Date(record[field]);
+                record[field] = keepUTC ? _dayjs.default.utc(record[field]) : new Date(record[field]);
               }
             });
           });
@@ -434,13 +439,13 @@ const getList = async _ref => {
             newDynamicColumns = newDynamicColumns.map(col => {
               if (col.addDrillDownIcon) {
                 col.renderCell = params => {
-                  return /*#__PURE__*/React.createElement(IconButton, {
+                  return /*#__PURE__*/React.createElement(_core.IconButton, {
                     onClick: e => modelConfig.onDrillDown(params, col),
                     size: "small",
                     style: {
                       padding: 1
                     }
-                  }, /*#__PURE__*/React.createElement(AddIcon, null));
+                  }, /*#__PURE__*/React.createElement(_Add.default, null));
                 };
               }
               if (col.key && !col.addDrillDownIcon) {

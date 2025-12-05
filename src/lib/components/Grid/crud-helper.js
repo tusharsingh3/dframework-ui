@@ -1,7 +1,11 @@
 import actionsStateProvider from "../useRouter/actions";
 import utils from "../utils";
+import constants from "../constants";
 import { transport, HTTP_STATUS_CODES } from "./httpRequest";
 import request from "./httpRequest";
+import dayjs from 'dayjs';
+import { IconButton } from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
 
 const dateDataTypes = ['date', 'dateTime'];
 let url = (window.location.host.indexOf("localhost") !== -1) ? '' : process.env.APP_HOST;
@@ -28,7 +32,7 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
     const dateColumns = [];
     gridColumns.forEach(({ lookup, type, field, keepLocal = false, keepLocalDate, keepUTC = false }) => {
         if (dateDataTypes.includes(type)) {
-            dateColumns.push({ field, keepLocal, keepLocalDate });
+            dateColumns.push({ field, keepLocal, keepLocalDate, keepUTC });
         }
         if (!lookup) {
             return;
@@ -76,7 +80,7 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
     }
     const requestData = {
         start: page * pageSize,
-        limit: isElasticExport ? modelConfig.exportSize : pageSize,
+        limit: modelConfig?.isClient ? 0 : isElasticExport ? modelConfig.exportSize : pageSize,
         ...extraParams,
         logicalOperator: filterModel.logicOperator,
         sort: sortModel.map(sort => (sort.filterField || sort.field) + ' ' + sort.sort).join(','),

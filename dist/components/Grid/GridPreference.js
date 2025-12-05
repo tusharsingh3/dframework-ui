@@ -6,8 +6,12 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+require("core-js/modules/es.array.includes.js");
 require("core-js/modules/es.array.push.js");
 require("core-js/modules/es.promise.js");
+require("core-js/modules/es.regexp.exec.js");
+require("core-js/modules/es.regexp.test.js");
+require("core-js/modules/es.string.includes.js");
 require("core-js/modules/es.string.trim.js");
 require("core-js/modules/esnext.iterator.constructor.js");
 require("core-js/modules/esnext.iterator.filter.js");
@@ -31,81 +35,56 @@ var _reactI18next = require("react-i18next");
 var _httpRequest = _interopRequireDefault(require("./httpRequest"));
 var _StateProvider = require("../useRouter/StateProvider");
 var _actions = _interopRequireDefault(require("../useRouter/actions"));
+var _utils = _interopRequireDefault(require("../utils"));
+var _constants = _interopRequireDefault(require("../constants"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
-function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); } // import { useRouter } from '../useRouter/useRouter';
-const actionTypes = {
-  Copy: "Copy",
-  Edit: "Edit",
-  Delete: "Delete"
-};
+function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 const formTypes = {
   Add: "Add",
   Edit: "Edit",
   Manage: 'Manage'
 };
-const gridColumns = [{
-  field: "prefName",
-  type: 'string',
-  width: 300,
-  headerName: "Preference Name",
-  sortable: false,
-  filterable: false
-}, {
-  field: "prefDesc",
-  type: 'string',
-  width: 300,
-  headerName: "Preference Description",
-  sortable: false,
-  filterable: false
-}, {
-  field: "isDefault",
-  type: "boolean",
-  width: 100,
-  headerName: "Default",
-  sortable: false,
-  filterable: false
-}, {
-  field: 'editAction',
-  type: 'actions',
-  headerName: '',
-  width: 20,
-  getActions: () => [/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
-    key: 1,
-    icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-      title: actionTypes.Edit
-    }, "   ", /*#__PURE__*/_react.default.createElement(_Edit.default, null)),
-    tabIndex: 1,
-    "data-action": actionTypes.Edit,
-    label: "Edit",
-    color: "primary"
-  })]
-}, {
-  field: 'deleteAction',
-  type: 'actions',
-  headerName: '',
-  width: 20,
-  getActions: () => [/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
-    key: 2,
-    icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-      title: actionTypes.Delete
-    }, /*#__PURE__*/_react.default.createElement(_Delete.default, null), " "),
-    tabIndex: 2,
-    "data-action": actionTypes.Delete,
-    label: "Delete",
-    color: "error"
-  })]
-}];
 const initialValues = {
   prefName: '',
   prefDesc: '',
   isDefault: false
 };
-let coolrDefaultPreference = 'CoolR Default';
+
+/**
+ * Checks if a preference has a valid name for display
+ * @param {Object} pref - The preference object to validate
+ * @returns {boolean} True if the preference has a valid name, false otherwise
+ */
+const hasValidPreferenceName = pref => {
+  return pref.prefName && pref.prefName.trim() !== '';
+};
+
+/**
+ * Checks if a preference is valid for the management grid (excludes invalid names)
+ * @param {Object} pref - The preference object to validate
+ * @returns {boolean} True if the preference should be displayed in management grid, false otherwise
+ */
+const isValidForManagement = pref => {
+  return hasValidPreferenceName(pref);
+};
+
+/**
+ * Creates validation schema for preference form
+ * @param {Function} t - Translation function
+ * @param {Object} tOpts - Translation options
+ * @returns {Object} Yup validation schema
+ */
+const createValidationSchema = (t, tOpts) => {
+  return yup.object({
+    prefName: yup.string().required(t('Preference Name is Required', tOpts)).test('not-only-whitespace', t('Preference Name cannot contain only whitespace', tOpts), value => value && value.trim().length > 0).max(20, t('Maximum Length is 20', tOpts)),
+    prefDesc: yup.string().max(100, t('Description maximum length is 100', tOpts))
+  });
+};
 const getGridColumnsFromRef = _ref => {
   let {
     refColumns,
@@ -135,11 +114,11 @@ const getGridColumnsFromRef = _ref => {
 const GridPreferences = _ref2 => {
   var _stateData$gridSettin;
   let {
-    tTranslate = key => key,
     model,
     gridRef,
     columns = [],
     setIsGridPreferenceFetched,
+    setIsLoading,
     initialGridRef
   } = _ref2;
   const {
@@ -179,14 +158,10 @@ const GridPreferences = _ref2 => {
   const filterModel = (0, _xDataGridPremium.useGridSelector)(gridRef, _xDataGridPremium.gridFilterModelSelector);
   const sortModel = (0, _xDataGridPremium.useGridSelector)(gridRef, _xDataGridPremium.gridSortModelSelector);
   const validationSchema = (0, _react.useMemo)(() => {
-    let schema = yup.object({
-      prefName: yup.string().required('Preference Name is Required').max(20, 'Maximum Length is 20'),
-      prefDesc: yup.string().max(100, "Description maximum length is 100")
-    });
-    return schema;
-  }, []);
+    return createValidationSchema(translate, tOpts);
+  }, [translate, tOpts]);
   (0, _react.useEffect)(() => {
-    const filteredPrefs = Array.isArray(preferences) ? preferences.filter(pref => pref.prefId !== 0) : [];
+    const filteredPrefs = preferences === null || preferences === void 0 ? void 0 : preferences.filter(isValidForManagement);
     setFilteredPrefs(filteredPrefs);
   }, [preferences]);
   const formik = (0, _formik.useFormik)({
@@ -207,7 +182,31 @@ const GridPreferences = _ref2 => {
     handleClose();
     setOpenDialog(false);
   };
-  const deletePreference = async (id, prefName) => {
+  const handleEditClick = params => {
+    if (params.id === 0) {
+      snackbar.showMessage(translate('Default Preference Can Not Be Edited', tOpts));
+      return;
+    }
+    setFormType(formTypes.Edit);
+    formik.setValues(params.row);
+    setOpenForm(true);
+  };
+  const handleDeleteClick = async params => {
+    var _params$row, _params$row2;
+    if (params.id === 0) {
+      snackbar.showMessage(translate('Default Preference Can Not Be Deleted', tOpts));
+      return;
+    }
+    await deletePreference(params.id, (_params$row = params.row) === null || _params$row === void 0 ? void 0 : _params$row.prefName, (_params$row2 = params.row) === null || _params$row2 === void 0 ? void 0 : _params$row2.isDefault);
+    getAllSavedPreferences({
+      preferenceName,
+      history: navigate,
+      dispatchData,
+      Username,
+      preferenceApi
+    });
+  };
+  const deletePreference = async (id, prefName, isDefault) => {
     let params = {
       action: 'delete',
       id: preferenceName,
@@ -226,7 +225,11 @@ const GridPreferences = _ref2 => {
           dispatchData
         });
       }
-      snackbar.showMessage('Preference Deleted Successfully.');
+      snackbar.showMessage(translate('Preference Deleted Successfully.', tOpts));
+      handleDialogClose();
+      if (isDefault) {
+        await applyPreference(_constants.default.defaultPreferenceId);
+      }
     }
   };
   const applySelectedPreference = async prefId => {
@@ -235,16 +238,15 @@ const GridPreferences = _ref2 => {
     }
     await applyPreference(prefId);
   };
-  function isNotCoolRDefault() {
-    let prefName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    return coolrDefaultPreference.toLowerCase() === prefName.trim().toLowerCase();
-  }
   const savePreference = async values => {
     var _filterModel$items;
     const presetName = values.prefName.trim();
-    const preferenceAlreadyExists = preferences.length > 0 && (preferences === null || preferences === void 0 ? void 0 : preferences.findIndex(ele => ele.prefName === presetName));
-    const isNotCoolRDefaultName = isNotCoolRDefault(presetName);
-    if (preferenceAlreadyExists > -1 && formType === formTypes.Add || isNotCoolRDefaultName) {
+    const preferenceAlreadyExists = preferences.findIndex(ele => {
+      // When editing, exclude the current preference from duplicate check
+      const isDifferentPreference = formType === formTypes.Edit ? ele.prefId !== values.prefId : true;
+      return isDifferentPreference && ele.prefName.toLocaleLowerCase() === presetName.toLocaleLowerCase();
+    });
+    if (preferenceAlreadyExists > -1) {
       setOpenPreferenceExistsModal(true);
       return;
     }
@@ -295,7 +297,8 @@ const GridPreferences = _ref2 => {
       dispatchData
     });
     if (response === true) {
-      snackbar.showMessage('Preference Saved Successfully.');
+      snackbar.showMessage(translate('Preference Saved Successfully.', tOpts));
+      handleDialogClose();
     }
     getAllSavedPreferences({
       preferenceName,
@@ -306,8 +309,11 @@ const GridPreferences = _ref2 => {
     });
   };
   const applyPreference = async prefId => {
+    if (setIsLoading) setIsLoading(true);
     let userPreferenceCharts;
+    let currentPreferenceName = '';
     if (prefId > 0) {
+      // If valid preference is selected, then fetch it's details
       const params = {
         action: 'load',
         id: preferenceName,
@@ -320,28 +326,41 @@ const GridPreferences = _ref2 => {
         dispatchData
       });
       userPreferenceCharts = response !== null && response !== void 0 && response.prefValue ? JSON.parse(response.prefValue) : null;
-      coolrDefaultPreference = response !== null && response !== void 0 && response.prefValue ? response.prefName : '';
+      if (response.prefValue) {
+        currentPreferenceName = response.prefName;
+      }
     } else {
-      const {
-        sorting,
-        filter,
-        pinnedColumns
-      } = initialGridRef.current.state;
-      const {
-        gridColumn,
-        columnVisibilityModel
-      } = getGridColumnsFromRef({
-        refColumns: initialGridRef.current.state.columns,
-        columns
+      // If default preference is selected, then reset to the initial state
+      // Use the deep-copied initial state from initialGridRef
+      if (!initialGridRef.current) {
+        console.error('Initial grid state not captured. Cannot reset to default.');
+        if (setIsLoading) setIsLoading(false);
+        return;
+      }
+      const initialState = initialGridRef.current;
+
+      // Reconstruct gridColumn from initial state
+      const gridColumn = initialState.columns.orderedFields.map(field => {
+        const colData = initialState.columns.lookup[field];
+        return {
+          field: field,
+          width: colData === null || colData === void 0 ? void 0 : colData.width,
+          flex: colData === null || colData === void 0 ? void 0 : colData.flex
+        };
       });
       userPreferenceCharts = {
-        gridColumn,
-        columnVisibilityModel,
-        pinnedColumns,
-        sortModel: sorting.sortModel,
-        filterModel: filter.filterModel
+        gridColumn: gridColumn,
+        columnVisibilityModel: _objectSpread({}, initialState.columns.columnVisibilityModel),
+        pinnedColumns: {
+          left: [...initialState.pinnedColumns.left],
+          right: [...initialState.pinnedColumns.right]
+        },
+        sortModel: [...initialState.sorting.sortModel],
+        filterModel: {
+          items: [...initialState.filter.filterModel.items],
+          linkOperator: initialState.filter.filterModel.linkOperator
+        }
       };
-      coolrDefaultPreference = 'CoolR Default';
     }
     if (userPreferenceCharts) {
       const {
@@ -351,31 +370,56 @@ const GridPreferences = _ref2 => {
         sortModel,
         filterModel
       } = userPreferenceCharts;
-      gridColumn.forEach(_ref3 => {
-        let {
-          field,
-          width
-        } = _ref3;
-        if (gridRef.current.getColumnIndex(field) !== -1) {
-          gridRef.current.setColumnWidth(field, width);
+      if (gridRef.current) {
+        const gridColumns = gridColumn || gridRef.current.getAllColumns();
+        const columnFields = gridColumns.map(column => column.field);
+
+        // Apply column widths
+        if (prefId === _constants.default.defaultPreferenceId) {
+          // Reset to initial widths from the captured initial state
+          gridColumns.forEach(col => {
+            var _initialGridRef$curre;
+            const initialColData = (_initialGridRef$curre = initialGridRef.current) === null || _initialGridRef$curre === void 0 || (_initialGridRef$curre = _initialGridRef$curre.columns) === null || _initialGridRef$curre === void 0 || (_initialGridRef$curre = _initialGridRef$curre.lookup) === null || _initialGridRef$curre === void 0 ? void 0 : _initialGridRef$curre[col.field];
+            if (initialColData && initialColData.width) {
+              gridRef.current.setColumnWidth(col.field, initialColData.width);
+            }
+          });
+        } else {
+          // Apply saved widths for custom preferences
+          gridColumn.forEach(_ref3 => {
+            let {
+              field,
+              width
+            } = _ref3;
+            if (columnFields.includes(field)) {
+              const columnIndex = gridColumns.findIndex(column => column.field === field);
+              if (columnIndex !== -1 && width) {
+                gridRef.current.setColumnWidth(field, width);
+              }
+            }
+          });
         }
-      });
-      gridRef.current.setColumnVisibilityModel(columnVisibilityModel);
-      gridRef.current.state.columns.orderedFields = gridColumn.map(_ref4 => {
-        let {
-          field
-        } = _ref4;
-        return field;
-      });
-      gridRef.current.setPinnedColumns(pinnedColumns);
-      gridRef.current.setSortModel(sortModel || []);
-      gridRef.current.setFilterModel(filterModel);
+
+        // Apply all preference settings to the grid
+        const orderedFields = gridColumn.map(_ref4 => {
+          let {
+            field
+          } = _ref4;
+          return field;
+        }).filter(field => columnFields.includes(field));
+        gridRef.current.state.columns.orderedFields = orderedFields;
+        gridRef.current.setColumnVisibilityModel(columnVisibilityModel);
+        gridRef.current.setPinnedColumns(pinnedColumns);
+        gridRef.current.setSortModel(sortModel || []);
+        gridRef.current.setFilterModel(filterModel);
+      }
       dispatchData({
         type: _actions.default.SET_CURRENT_PREFERENCE_NAME,
-        payload: coolrDefaultPreference
+        payload: currentPreferenceName
       });
       setIsGridPreferenceFetched(true);
     }
+    if (setIsLoading) setIsLoading(false);
   };
   const getGridRowId = row => {
     return row['GridPreferenceId'];

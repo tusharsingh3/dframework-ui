@@ -248,12 +248,12 @@ const GridBase = memo(({
     const { pathname, navigate } = useRouter()
     const apiRef = useGridApiRef();
     const initialGridRef = useRef(null);
-    const { idProperty = "id", showHeaderFilters = true, disableRowSelectionOnClick = true, createdOnKeepLocal = true, hideBackButton = false, hideTopFilters = true, updatePageTitle = true, isElasticScreen = false, enablePivoting = false, showCreateButton, hideExcelExport = false, hideXmlExport = false, hideHtmlExport = false, hideJsonExport = false, disableRowGrouping = true, applyDefaultClientFilter = true, isPivotGrid = false, groupBy: modelGroupBy = '',  } = model;
+    const { idProperty = "id", showHeaderFilters = true, disableRowSelectionOnClick = true, createdOnKeepLocal = false, hideBackButton = false, hideTopFilters = true, updatePageTitle = true, isElasticScreen = false, enablePivoting = false, showCreateButton, hideExcelExport = false, hideXmlExport = false, hideHtmlExport = false, hideJsonExport = false, disableRowGrouping = true, applyDefaultClientFilter = true, isPivotGrid = false, groupBy: modelGroupBy = '',  } = model;
     const isReadOnly = model.readOnly === true;
     const isDoubleClicked = model.doubleClicked === false;
     const dataRef = useRef(data);
     const showAddIcon = model.showAddIcon === true;
-    const toLink = (model.columns || []).map(item => item.link);
+    const toLink = (model.columns || []).some(item => item.link === true);
     const [isGridPreferenceFetched, setIsGridPreferenceFetched] = useState(false);
     const classes = useStyles();
     const effectivePermissions = { ...constants.permissions, ...stateData.gridSettings.permissions, ...model.permissions, ...permissions };
@@ -266,10 +266,6 @@ const GridBase = memo(({
     const url = stateData?.gridSettings?.permissions?.Url;
     const withControllersUrl = stateData?.gridSettings?.permissions?.withControllersUrl;
     const currentPreference = stateData?.currentPreference;
-
-    const OrderSuggestionHistoryFields = {
-        OrderStatus: 'OrderStatusId'
-    }
     const preferenceApi = stateData?.gridSettings?.permissions?.preferenceApi;
     const groupingModelRef = React.useRef(null);
     const gridColumnTypes = {
@@ -281,25 +277,35 @@ const GridBase = memo(({
             "filterOperators": getGridStringOperators().filter(op => !['doesNotContain', 'doesNotEqual'].includes(op.value))
         },
         "date": {
-            "valueFormatter": (value) => (
-                formatDate(value, true, false, stateData.dateTime)
-            ),
+            "valueFormatter": (value) => {
+                if (!value) return '';
+                return formatDate(value, true, false, stateData.dateTime);
+            },
             "filterOperators": LocalizedDatePicker({ columnType: "date" }),
         },
         "dateTime": {
-            "valueFormatter": (value) => (
-                formatDate(value, false, false, stateData.dateTime)
-            ),
+            "valueFormatter": (value) => {
+                if (!value) return '';
+                return formatDate(value, false, false, stateData.dateTime);
+            },
             "filterOperators": LocalizedDatePicker({ columnType: "datetime" }),
         },
         "dateTimeLocal": {
-            "valueFormatter": (value) => (
-                formatDate(value, false, false, stateData.dateTime)
-            ),
+            "valueFormatter": (value) => {
+                if (!value) return '';
+                return formatDate(value, false, false, stateData.dateTime);
+            },
             "filterOperators": LocalizedDatePicker({ type: "dateTimeLocal", convert: true }),
         },
         "boolean": {
             renderCell: booleanIconRenderer
+        },
+        "percentage": {
+            "valueFormatter": (value) => {
+                if (value == null) return '';
+                const numericValue = Number(value);
+                return !isNaN(numericValue) ? `${numericValue.toFixed(1)}%` : '';
+            }
         }
     }
 
@@ -1189,7 +1195,7 @@ const GridBase = memo(({
 
             const isValidValue = (constants.emptyIsAnyOfOperatorFilters.includes(operator)) || (isNumber && !isNaN(value)) || (!isNumber);
 
-            if (field === OrderSuggestionHistoryFields.OrderStatus) {
+            if (field === constants.OrderSuggestionHistoryFields.OrderStatus) {
                 const { filterField, ...newItem } = item;
                 return newItem;
             }
@@ -1374,8 +1380,8 @@ const GridBase = memo(({
 
     return (
         <>
-            {model?.showGlobalFiltersComponent && {GlobalFiltersComponent}}
-            {childTabTitle ? <div className="child-tab-title">{childTabTitle}</div> : null}{model?.externalHeaderFilters ? {externalHeaderFiltersComponent}
+            {model?.showGlobalFiltersComponent && model.GlobalFiltersComponent}
+            {childTabTitle ? <div className="child-tab-title">{childTabTitle}</div> : null}{model?.externalHeaderFilters ? externalHeaderFiltersComponent
                 : null
             }
             <div style={gridStyle || customStyle}>
@@ -1485,6 +1491,9 @@ const GridBase = memo(({
                             pinnedColumns: pinnedColumns,
                             pagination: {
                                 paginationModel: paginationModel
+                            },
+                            sorting: {
+                                sortModel: sortModel
                             },
                             filter: {
                                 filterModel: initialFilterModel

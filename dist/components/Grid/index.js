@@ -10,6 +10,7 @@ require("core-js/modules/es.array.includes.js");
 require("core-js/modules/es.array.push.js");
 require("core-js/modules/es.array.reduce.js");
 require("core-js/modules/es.json.stringify.js");
+require("core-js/modules/es.number.to-fixed.js");
 require("core-js/modules/es.object.assign.js");
 require("core-js/modules/es.parse-int.js");
 require("core-js/modules/es.promise.js");
@@ -397,7 +398,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     idProperty = "id",
     showHeaderFilters = true,
     disableRowSelectionOnClick = true,
-    createdOnKeepLocal = true,
+    createdOnKeepLocal = false,
     hideBackButton = false,
     hideTopFilters = true,
     updatePageTitle = true,
@@ -417,7 +418,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   const isDoubleClicked = model.doubleClicked === false;
   const dataRef = (0, _react.useRef)(data);
   const showAddIcon = model.showAddIcon === true;
-  const toLink = (model.columns || []).map(item => item.link);
+  const toLink = (model.columns || []).some(item => item.link === true);
   const [isGridPreferenceFetched, setIsGridPreferenceFetched] = (0, _react.useState)(false);
   const classes = useStyles();
   const effectivePermissions = _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, _constants.default.permissions), stateData.gridSettings.permissions), model.permissions), permissions);
@@ -434,9 +435,6 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   const url = stateData === null || stateData === void 0 || (_stateData$gridSettin2 = stateData.gridSettings) === null || _stateData$gridSettin2 === void 0 || (_stateData$gridSettin2 = _stateData$gridSettin2.permissions) === null || _stateData$gridSettin2 === void 0 ? void 0 : _stateData$gridSettin2.Url;
   const withControllersUrl = stateData === null || stateData === void 0 || (_stateData$gridSettin3 = stateData.gridSettings) === null || _stateData$gridSettin3 === void 0 || (_stateData$gridSettin3 = _stateData$gridSettin3.permissions) === null || _stateData$gridSettin3 === void 0 ? void 0 : _stateData$gridSettin3.withControllersUrl;
   const currentPreference = stateData === null || stateData === void 0 ? void 0 : stateData.currentPreference;
-  const OrderSuggestionHistoryFields = {
-    OrderStatus: 'OrderStatusId'
-  };
   const preferenceApi = stateData === null || stateData === void 0 || (_stateData$gridSettin4 = stateData.gridSettings) === null || _stateData$gridSettin4 === void 0 || (_stateData$gridSettin4 = _stateData$gridSettin4.permissions) === null || _stateData$gridSettin4 === void 0 ? void 0 : _stateData$gridSettin4.preferenceApi;
   const groupingModelRef = _react.default.useRef(null);
   const gridColumnTypes = {
@@ -448,19 +446,28 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       "filterOperators": (0, _xDataGridPremium.getGridStringOperators)().filter(op => !['doesNotContain', 'doesNotEqual'].includes(op.value))
     },
     "date": {
-      "valueFormatter": value => formatDate(value, true, false, stateData.dateTime),
+      "valueFormatter": value => {
+        if (!value) return '';
+        return formatDate(value, true, false, stateData.dateTime);
+      },
       "filterOperators": (0, _LocalizedDatePicker.default)({
         columnType: "date"
       })
     },
     "dateTime": {
-      "valueFormatter": value => formatDate(value, false, false, stateData.dateTime),
+      "valueFormatter": value => {
+        if (!value) return '';
+        return formatDate(value, false, false, stateData.dateTime);
+      },
       "filterOperators": (0, _LocalizedDatePicker.default)({
         columnType: "datetime"
       })
     },
     "dateTimeLocal": {
-      "valueFormatter": value => formatDate(value, false, false, stateData.dateTime),
+      "valueFormatter": value => {
+        if (!value) return '';
+        return formatDate(value, false, false, stateData.dateTime);
+      },
       "filterOperators": (0, _LocalizedDatePicker.default)({
         type: "dateTimeLocal",
         convert: true
@@ -468,6 +475,13 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     },
     "boolean": {
       renderCell: booleanIconRenderer
+    },
+    "percentage": {
+      "valueFormatter": value => {
+        if (value == null) return '';
+        const numericValue = Number(value);
+        return !isNaN(numericValue) ? "".concat(numericValue.toFixed(1), "%") : '';
+      }
     }
   };
   (0, _react.useEffect)(() => {
@@ -1528,7 +1542,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       }
       const isNumber = (column === null || column === void 0 ? void 0 : column.type) === _constants.default.filterFieldDataTypes.Number || (column === null || column === void 0 ? void 0 : column.type) === _constants.default.filterFieldDataTypes.Decimal;
       const isValidValue = _constants.default.emptyIsAnyOfOperatorFilters.includes(operator) || isNumber && !isNaN(value) || !isNumber;
-      if (field === OrderSuggestionHistoryFields.OrderStatus) {
+      if (field === _constants.default.OrderSuggestionHistoryFields.OrderStatus) {
         const {
             filterField
           } = item,
@@ -1742,13 +1756,9 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     return [...orderedCols, ...missingCols];
   }, [gridColumns, columnOrderModel]);
   const hideFooter = model.showFooter === false;
-  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, (model === null || model === void 0 ? void 0 : model.showGlobalFiltersComponent) && {
-    GlobalFiltersComponent
-  }, childTabTitle ? /*#__PURE__*/_react.default.createElement("div", {
+  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, (model === null || model === void 0 ? void 0 : model.showGlobalFiltersComponent) && model.GlobalFiltersComponent, childTabTitle ? /*#__PURE__*/_react.default.createElement("div", {
     className: "child-tab-title"
-  }, childTabTitle) : null, model !== null && model !== void 0 && model.externalHeaderFilters ? {
-    externalHeaderFiltersComponent
-  } : null, /*#__PURE__*/_react.default.createElement("div", {
+  }, childTabTitle) : null, model !== null && model !== void 0 && model.externalHeaderFilters ? externalHeaderFiltersComponent : null, /*#__PURE__*/_react.default.createElement("div", {
     style: gridStyle || customStyle
   }, /*#__PURE__*/_react.default.createElement(_Box.default, {
     className: "grid-parent-container",
@@ -1860,6 +1870,9 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       pinnedColumns: pinnedColumns,
       pagination: {
         paginationModel: paginationModel
+      },
+      sorting: {
+        sortModel: sortModel
       },
       filter: {
         filterModel: initialFilterModel

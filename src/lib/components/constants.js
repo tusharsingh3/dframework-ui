@@ -24,7 +24,10 @@ const constants = {
         "ru-RU": "Russian"
     },
     ShowCustomActions: [9, 58],
-    pageSizeOptions: [5, 10, 20, 50, 100]
+    pageSizeOptions: [5, 10, 20, 50, 100],
+    OrderSuggestionHistoryFields: {
+        OrderStatus: 'OrderStatusId'
+    }
 }
 
 export default constants;
