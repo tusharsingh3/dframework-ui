@@ -50,7 +50,10 @@ const utils = {
 		} else {
 			return transformed[0].toUpperCase() + transformed.substring(1)
 		}
-	}
+	},
+	isAdminORSuperAdmin(value) {
+		return Number(value) === 1;
+	},
 }
 
 export default utils;
