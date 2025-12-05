@@ -40,6 +40,7 @@ const constants = {
     "it-IT": "Italian",
     "ru-RU": "Russian"
   },
-  ShowCustomActions: [9, 58]
+  ShowCustomActions: [9, 58],
+  pageSizeOptions: [5, 10, 20, 50, 100]
 };
 var _default = exports.default = constants;

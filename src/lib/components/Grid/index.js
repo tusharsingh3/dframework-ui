@@ -253,7 +253,7 @@ const GridBase = memo(({
     const isDoubleClicked = model.doubleClicked === false;
     const dataRef = useRef(data);
     const showAddIcon = model.showAddIcon === true;
-    const toLink = model.columns.map(item => item.link);
+    const toLink = (model.columns || []).map(item => item.link);
     const [isGridPreferenceFetched, setIsGridPreferenceFetched] = useState(false);
     const classes = useStyles();
     const effectivePermissions = { ...constants.permissions, ...stateData.gridSettings.permissions, ...model.permissions, ...permissions };
@@ -412,7 +412,7 @@ const GridBase = memo(({
     }, []);
 
     const { gridColumns, pinnedColumns, lookupMap } = useMemo(() => {
-        const baseColumnList = columns || model?.gridColumns || model?.columns;
+        const baseColumnList = columns || model?.gridColumns || model?.columns || [];
         const pinnedColumns = { left: [GRID_CHECKBOX_SELECTION_COL_DEF.field], right: [] };
         const finalColumns = [];
         const lookupMap = {};

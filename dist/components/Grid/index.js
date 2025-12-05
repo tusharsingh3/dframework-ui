@@ -415,7 +415,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   const isDoubleClicked = model.doubleClicked === false;
   const dataRef = (0, _react.useRef)(data);
   const showAddIcon = model.showAddIcon === true;
-  const toLink = model.columns.map(item => item.link);
+  const toLink = (model.columns || []).map(item => item.link);
   const [isGridPreferenceFetched, setIsGridPreferenceFetched] = (0, _react.useState)(false);
   const classes = useStyles();
   const effectivePermissions = _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, _constants.default.permissions), stateData.gridSettings.permissions), model.permissions), permissions);
@@ -590,7 +590,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     pinnedColumns,
     lookupMap
   } = (0, _react.useMemo)(() => {
-    const baseColumnList = columns || (model === null || model === void 0 ? void 0 : model.gridColumns) || (model === null || model === void 0 ? void 0 : model.columns);
+    const baseColumnList = columns || (model === null || model === void 0 ? void 0 : model.gridColumns) || (model === null || model === void 0 ? void 0 : model.columns) || [];
     const pinnedColumns = {
       left: [_xDataGridPremium.GRID_CHECKBOX_SELECTION_COL_DEF.field],
       right: []
