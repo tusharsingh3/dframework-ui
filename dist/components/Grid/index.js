@@ -142,9 +142,11 @@ ExportMenuItem.propTypes = {
 };
 const CustomExportButton = props => {
   const {
-    tTranslate,
+    t,
     tOpts
   } = props;
+  // Fallback to t if tTranslate is not provided (for backwards compatibility)
+  const tTranslate = t || (key => key);
   return /*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridToolbarExportContainer, props, (props === null || props === void 0 ? void 0 : props.showOnlyExcelExport) !== true && /*#__PURE__*/_react.default.createElement(ExportMenuItem, _extends({}, props, {
     icon: /*#__PURE__*/_react.default.createElement(_iconsMaterial.GridOn, {
       fontSize: "small"

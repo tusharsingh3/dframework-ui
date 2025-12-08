@@ -48,7 +48,11 @@ const CustomToolbar = function CustomToolbar(props) {
     setIsLoading,
     CustomExportButton,
     effectivePermissions,
-    tTranslate
+    showExportWithDetails,
+    showExportWithLatestData,
+    showInFieldStatusPivotExportBtn,
+    showInstallationPivotExportBtn,
+    detailExportLabel
   } = props;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "grid-header-alignment"
@@ -113,12 +117,18 @@ const CustomToolbar = function CustomToolbar(props) {
     t: t,
     tOpts: tOpts,
     handleExport: handleExport,
+    onExportMenuClick: onExportMenuClick,
     showPivotExportBtn: model === null || model === void 0 ? void 0 : model.showPivotExportBtn,
     showOnlyExcelExport: model.showOnlyExcelExport,
     hideExcelExport: hideExcelExport,
     hideXmlExport: hideXmlExport,
     hideHtmlExport: hideHtmlExport,
-    hideJsonExport: hideJsonExport
+    hideJsonExport: hideJsonExport,
+    showExportWithDetails: showExportWithDetails,
+    showExportWithLatestData: showExportWithLatestData,
+    showInFieldStatusPivotExportBtn: showInFieldStatusPivotExportBtn,
+    showInstallationPivotExportBtn: showInstallationPivotExportBtn,
+    detailExportLabel: detailExportLabel
   }), model.preferenceId && /*#__PURE__*/_react.default.createElement(_GridPreference.default, {
     t: t,
     gridRef: apiRef,

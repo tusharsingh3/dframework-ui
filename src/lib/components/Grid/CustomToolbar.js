@@ -40,7 +40,11 @@ const CustomToolbar = function (props) {
         setIsLoading,
         CustomExportButton,
         effectivePermissions,
-        tTranslate
+        showExportWithDetails,
+        showExportWithLatestData,
+        showInFieldStatusPivotExportBtn,
+        showInstallationPivotExportBtn,
+        detailExportLabel
     } = props;
 
     return (
@@ -60,7 +64,23 @@ const CustomToolbar = function (props) {
                     {effectivePermissions?.filter && <GridToolbarFilterButton />}
                     {effectivePermissions?.filter && <Button startIcon={<FilterListOffIcon />} onClick={clearFilters} size="small" sx={{ width: 'max-content' }}>{t("CLEAR FILTER", tOpts)}</Button>}
                     {effectivePermissions.export && (
-                        <CustomExportButton t={t} tOpts={tOpts} handleExport={handleExport} showPivotExportBtn={model?.showPivotExportBtn} showOnlyExcelExport={model.showOnlyExcelExport} hideExcelExport={hideExcelExport} hideXmlExport={hideXmlExport} hideHtmlExport={hideHtmlExport} hideJsonExport={hideJsonExport} />
+                        <CustomExportButton 
+                            t={t} 
+                            tOpts={tOpts} 
+                            handleExport={handleExport} 
+                            onExportMenuClick={onExportMenuClick}
+                            showPivotExportBtn={model?.showPivotExportBtn} 
+                            showOnlyExcelExport={model.showOnlyExcelExport} 
+                            hideExcelExport={hideExcelExport} 
+                            hideXmlExport={hideXmlExport} 
+                            hideHtmlExport={hideHtmlExport} 
+                            hideJsonExport={hideJsonExport}
+                            showExportWithDetails={showExportWithDetails}
+                            showExportWithLatestData={showExportWithLatestData}
+                            showInFieldStatusPivotExportBtn={showInFieldStatusPivotExportBtn}
+                            showInstallationPivotExportBtn={showInstallationPivotExportBtn}
+                            detailExportLabel={detailExportLabel}
+                        />
                     )}
                     {model.preferenceId &&
                        <GridPreferences t={t} gridRef={apiRef} columns={gridColumns} setIsGridPreferenceFetched={setIsGridPreferenceFetched} model={model} initialGridRef={initialGridRef} setIsLoading={setIsLoading} />
