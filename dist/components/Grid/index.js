@@ -416,7 +416,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   const disablePivoting = !enablePivoting;
   const url = stateData === null || stateData === void 0 || (_stateData$gridSettin2 = stateData.gridSettings) === null || _stateData$gridSettin2 === void 0 || (_stateData$gridSettin2 = _stateData$gridSettin2.permissions) === null || _stateData$gridSettin2 === void 0 ? void 0 : _stateData$gridSettin2.Url;
   const withControllersUrl = stateData === null || stateData === void 0 || (_stateData$gridSettin3 = stateData.gridSettings) === null || _stateData$gridSettin3 === void 0 || (_stateData$gridSettin3 = _stateData$gridSettin3.permissions) === null || _stateData$gridSettin3 === void 0 ? void 0 : _stateData$gridSettin3.withControllersUrl;
-  const currentPreference = stateData === null || stateData === void 0 ? void 0 : stateData.currentPreference;
+  const currentPreference = (stateData === null || stateData === void 0 ? void 0 : stateData.currentPreference) === 'CoolR Default' ? null : stateData === null || stateData === void 0 ? void 0 : stateData.currentPreference;
   const emptyIsAnyOfOperatorFilters = ["isEmpty", "isNotEmpty", "isAnyOf"];
   const filterFieldDataTypes = {
     Number: 'number',
@@ -1334,8 +1334,8 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     pageSizeOptions: [5, 10, 20, 50, 100],
     onPaginationModelChange: setPaginationModel,
     pagination: true,
-    rowCount: data.recordCount,
-    rows: data.records,
+    rowCount: data.recordCount || 0,
+    rows: data.records || [],
     sortModel: sortModel,
     paginationMode: isClient,
     sortingMode: isClient,

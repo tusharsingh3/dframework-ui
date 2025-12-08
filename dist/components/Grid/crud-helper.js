@@ -338,6 +338,7 @@ const getList = async _ref => {
     } else {
       response = await (0, _httpRequest.transport)(params);
       if (response.status === _httpRequest.HTTP_STATUS_CODES.OK) {
+        var _response$data2, _response$data3;
         const {
           records,
           userCurrencySymbol
@@ -374,7 +375,11 @@ const getList = async _ref => {
             setColumns([...modelConfig.columns, ...newDynamicColumns]);
           }
         }
-        setData(response.data);
+        // Ensure records and recordCount always have defaults
+        setData(_objectSpread(_objectSpread({}, response.data), {}, {
+          records: ((_response$data2 = response.data) === null || _response$data2 === void 0 ? void 0 : _response$data2.records) || [],
+          recordCount: ((_response$data3 = response.data) === null || _response$data3 === void 0 ? void 0 : _response$data3.recordCount) || 0
+        }));
         if (setFetchData) setFetchData(true);
         if (afterDataSet && !isDataFetchedInitially) {
           afterDataSet();

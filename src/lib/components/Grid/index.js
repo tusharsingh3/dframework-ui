@@ -243,7 +243,7 @@ const GridBase = memo(({
     const disablePivoting = !enablePivoting;
     const url = stateData?.gridSettings?.permissions?.Url;
     const withControllersUrl = stateData?.gridSettings?.permissions?.withControllersUrl;
-    const currentPreference = stateData?.currentPreference;
+    const currentPreference = stateData?.currentPreference === 'CoolR Default' ? null : stateData?.currentPreference;
     const emptyIsAnyOfOperatorFilters = ["isEmpty", "isNotEmpty", "isAnyOf"];
     const filterFieldDataTypes = {
         Number: 'number',
@@ -1033,8 +1033,8 @@ const GridBase = memo(({
                         pageSizeOptions={[5, 10, 20, 50, 100]}
                         onPaginationModelChange={setPaginationModel}
                         pagination
-                        rowCount={data.recordCount}
-                        rows={data.records}
+                        rowCount={data.recordCount || 0}
+                        rows={data.records || []}
                         sortModel={sortModel}
                         paginationMode={isClient}
                         sortingMode={isClient}

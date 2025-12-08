@@ -263,7 +263,12 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
                         setColumns([...modelConfig.columns, ...newDynamicColumns]);
                     }
                 }
-                setData(response.data);
+                // Ensure records and recordCount always have defaults
+                setData({
+                    ...response.data,
+                    records: response.data?.records || [],
+                    recordCount: response.data?.recordCount || 0
+                });
                 if (setFetchData)
                     setFetchData(true);
                 if (afterDataSet && !isDataFetchedInitially) {
