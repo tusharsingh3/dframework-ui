@@ -255,7 +255,6 @@ const GridPreferences = _ref2 => {
     }
   };
   const applySelectedPreference = async prefId => {
-    handleClose(); // Close the menu first
     if (setIsGridPreferenceFetched) {
       setIsGridPreferenceFetched(false);
     }
@@ -582,8 +581,8 @@ const GridPreferences = _ref2 => {
       prefId
     } = ele;
     return /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-      onClick: () => applySelectedPreference(prefId),
-      component: _material.ListItemButton,
+      onClick: () => applySelectedPreference(prefId, key),
+      component: _material.ListItem,
       key: "pref-item-".concat(key),
       title: t(prefDesc, tOpts),
       dense: true

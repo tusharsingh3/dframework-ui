@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, List, ListItemButton, ListItemText, Menu, MenuItem, Stack, TextField, Typography, Tooltip } from '@mui/material';
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, List, ListItem, ListItemButton, ListItemText, Menu, MenuItem, Stack, TextField, Typography, Tooltip } from '@mui/material';
 import { DataGridPremium, GridActionsCellItem, gridFilterModelSelector, gridSortModelSelector, useGridSelector, useGridApiRef, } from '@mui/x-data-grid-premium';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -172,7 +172,6 @@ const GridPreferences = ({ t, model, gridRef, columns = [], setIsGridPreferenceF
     }
 
     const applySelectedPreference = async (prefId) => {
-        handleClose(); // Close the menu first
         if (setIsGridPreferenceFetched) {
             setIsGridPreferenceFetched(false);
         }
@@ -440,8 +439,8 @@ const GridPreferences = ({ t, model, gridRef, columns = [], setIsGridPreferenceF
                     const { prefName, prefDesc, prefId } = ele;
                     return (
                         <MenuItem
-                            onClick={() => applySelectedPreference(prefId)}
-                            component={ListItemButton}
+                            onClick={() => applySelectedPreference(prefId, key)}
+                            component={ListItem}
                             key={`pref-item-${key}`}
                             title={t(prefDesc, tOpts)}
                             dense
