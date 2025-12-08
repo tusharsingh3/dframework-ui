@@ -192,7 +192,7 @@ const GridBase = memo(({
     showInstallationPivotExportBtn = false,
     detailExportLabel = "Excel with Details",
     rowSelectionModel = undefined,
-    GlobalFiltersComponent = null,
+    globalFiltersComponent = null,
     customApplyFunction = null
 }) => {
     const [paginationModel, setPaginationModel] = useState({ pageSize: defaultPageSize, page: 0 });
@@ -236,7 +236,7 @@ const GridBase = memo(({
     const classes = useStyles();
     const { systemDateTimeFormat, stateData, dispatchData, formatDate, removeCurrentPreferenceName, getAllSavedPreferences, applyDefaultPreferenceIfExists } = useStateContext();
     const modelPermissions = model.modelPermissions || permissions;
-    const effectivePermissions = { ...constants.permissions };
+    const effectivePermissions = { ...constants.permissions, ...stateData.gridSettings.permissions, ...modelPermissions };
     const { ClientId } = stateData?.getUserData ? stateData.getUserData : {};
     const { Username } = stateData?.getUserData ? stateData.getUserData : {};
     const routesWithNoChildRoute = stateData.gridSettings.permissions?.routesWithNoChildRoute || [];
@@ -1006,12 +1006,7 @@ const GridBase = memo(({
         // Return ordered columns + any missing columns at the end
         return [...orderedCols, ...missingCols];
     }, [gridColumns, columnOrderModel]);
-
-    const isChildParentGrid = model?.childTabs?.length > 0;
-    let parentChildGridClassName = isChildParentGrid ? 'parent-grid' : '';
-
     const hideFooter = model.showFooter === false;
-
     return (
         <>
             {model?.globalFilters?.filterConfig?.length && GlobalFiltersComponent && (
@@ -1022,7 +1017,7 @@ const GridBase = memo(({
                 />
             )}
             <div style={gridStyle || customStyle}>
-                <Box className={`grid-parent-container ${parentChildGridClassName}`}>
+                <Box className={`grid-parent-container`}>
                     <DataGridPremium
                         showToolbar
                         headerFilters={showHeaderFilters}

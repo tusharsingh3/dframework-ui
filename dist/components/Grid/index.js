@@ -266,7 +266,7 @@ const convertDefaultSort = defaultSort => {
   return orderBy;
 };
 const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
-  var _stateData$gridSettin, _stateData$gridSettin2, _stateData$gridSettin3, _model$tTranslate, _stateData$gridSettin4, _model$childTabs, _model$globalFilters;
+  var _stateData$gridSettin, _stateData$gridSettin2, _stateData$gridSettin3, _model$tTranslate, _stateData$gridSettin4, _model$globalFilters;
   let {
     useLinkColumn = true,
     model,
@@ -311,7 +311,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     showInstallationPivotExportBtn = false,
     detailExportLabel = "Excel with Details",
     rowSelectionModel = undefined,
-    GlobalFiltersComponent = null,
+    globalFiltersComponent = null,
     customApplyFunction = null
   } = _ref2;
   const [paginationModel, setPaginationModel] = (0, _react.useState)({
@@ -405,7 +405,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     applyDefaultPreferenceIfExists
   } = (0, _StateProvider.useStateContext)();
   const modelPermissions = model.modelPermissions || permissions;
-  const effectivePermissions = _objectSpread({}, _constants.default.permissions);
+  const effectivePermissions = _objectSpread(_objectSpread(_objectSpread({}, _constants.default.permissions), stateData.gridSettings.permissions), modelPermissions);
   const {
     ClientId
   } = stateData !== null && stateData !== void 0 && stateData.getUserData ? stateData.getUserData : {};
@@ -1310,8 +1310,6 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     // Return ordered columns + any missing columns at the end
     return [...orderedCols, ...missingCols];
   }, [gridColumns, columnOrderModel]);
-  const isChildParentGrid = (model === null || model === void 0 || (_model$childTabs = model.childTabs) === null || _model$childTabs === void 0 ? void 0 : _model$childTabs.length) > 0;
-  let parentChildGridClassName = isChildParentGrid ? 'parent-grid' : '';
   const hideFooter = model.showFooter === false;
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, (model === null || model === void 0 || (_model$globalFilters = model.globalFilters) === null || _model$globalFilters === void 0 || (_model$globalFilters = _model$globalFilters.filterConfig) === null || _model$globalFilters === void 0 ? void 0 : _model$globalFilters.length) && GlobalFiltersComponent && /*#__PURE__*/_react.default.createElement(GlobalFiltersComponent, {
     filterGroupByConfig: model.globalFilters,
@@ -1320,7 +1318,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   }), /*#__PURE__*/_react.default.createElement("div", {
     style: gridStyle || customStyle
   }, /*#__PURE__*/_react.default.createElement(_Box.default, {
-    className: "grid-parent-container ".concat(parentChildGridClassName)
+    className: "grid-parent-container"
   }, /*#__PURE__*/_react.default.createElement(_xDataGridPremium.DataGridPremium, {
     showToolbar: true,
     headerFilters: showHeaderFilters,

@@ -54,6 +54,7 @@ const CustomToolbar = function CustomToolbar(props) {
     showInstallationPivotExportBtn,
     detailExportLabel
   } = props;
+  console.log('current preference in CustomToolbar:', currentPreference);
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "grid-header-alignment"
   }, /*#__PURE__*/_react.default.createElement("div", {
@@ -65,7 +66,7 @@ const CustomToolbar = function CustomToolbar(props) {
     sx: {
       ml: 1
     }
-  }, " ", t(model.gridSubTitle, tOpts)), (currentPreference === null || currentPreference === void 0 ? void 0 : currentPreference[model.preferenceId]) && model.preferenceId && /*#__PURE__*/_react.default.createElement(_Typography.default, {
+  }, " ", t(model.gridSubTitle, tOpts)), /*#__PURE__*/_react.default.createElement(_Typography.default, {
     className: "preference-name-text",
     variant: "h6",
     component: "h6",
