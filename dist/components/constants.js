@@ -55,6 +55,12 @@ const constants = {
     IsAnyOf: 'isAnyOf'
   },
   emptyIsAnyOfOperatorFilters: ["isEmpty", "isNotEmpty", "isAnyOf"],
+  emptyNotEmptyOperators: ["isEmpty", "isNotEmpty"],
+  contentTypeToFileType: {
+    'text/csv': 'CSV',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'XLSX',
+    'application/pdf': 'PDF'
+  },
   filterFieldDataTypes: {
     Number: 'number',
     String: 'string',

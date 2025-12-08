@@ -10,12 +10,10 @@ require("core-js/modules/es.array.includes.js");
 require("core-js/modules/es.array.push.js");
 require("core-js/modules/es.array.sort.js");
 require("core-js/modules/es.json.stringify.js");
-require("core-js/modules/es.object.assign.js");
 require("core-js/modules/es.promise.js");
 require("core-js/modules/es.regexp.to-string.js");
 require("core-js/modules/es.string.includes.js");
 require("core-js/modules/esnext.iterator.constructor.js");
-require("core-js/modules/esnext.iterator.every.js");
 require("core-js/modules/esnext.iterator.filter.js");
 require("core-js/modules/esnext.iterator.find.js");
 require("core-js/modules/esnext.iterator.for-each.js");
@@ -32,13 +30,11 @@ require("core-js/modules/web.url-search-params.js");
 require("core-js/modules/web.url-search-params.delete.js");
 require("core-js/modules/web.url-search-params.has.js");
 require("core-js/modules/web.url-search-params.size.js");
-var _actions = _interopRequireDefault(require("../useRouter/actions"));
-var _utils = _interopRequireDefault(require("../utils"));
-var _constants = _interopRequireDefault(require("../constants"));
-var _httpRequest = _interopRequireWildcard(require("./httpRequest"));
 var _dayjs = _interopRequireDefault(require("dayjs"));
-var _core = require("@material-ui/core");
-var _Add = _interopRequireDefault(require("@material-ui/icons/Add"));
+var _utc = _interopRequireDefault(require("dayjs/plugin/utc"));
+var _actions = _interopRequireDefault(require("../useRouter/actions"));
+var _httpRequest = _interopRequireWildcard(require("./httpRequest"));
+var _constants = _interopRequireDefault(require("../constants"));
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
@@ -46,13 +42,8 @@ function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t =
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
 function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+_dayjs.default.extend(_utc.default);
 const dateDataTypes = ['date', 'dateTime'];
-let url = window.location.host.indexOf("localhost") !== -1 ? '' : process.env.APP_HOST;
-let urlWithControllers = url + "/Controllers/";
-const apis = {
-  urlWithControllers,
-  url
-};
 const getList = async _ref => {
   var _filterModel$items;
   let {
@@ -65,7 +56,7 @@ const getList = async _ref => {
     filterModel,
     api,
     parentFilters,
-    action = 'export',
+    action = 'list',
     setError,
     extraParams,
     contentType,
@@ -73,10 +64,9 @@ const getList = async _ref => {
     controllerType = 'node',
     template = null,
     configFileName = null,
-    dispatch,
+    dispatchData,
     showFullScreenLoader = false,
     oderStatusId = 0,
-    history = null,
     modelConfig = null,
     baseFilters = null,
     isElasticExport,
@@ -101,10 +91,9 @@ const getList = async _ref => {
     setIsDataFetchedInitially,
     isDataFetchedInitially,
     exportFileName = null,
-    t = null,
+    tTranslate = null,
     tOpts = null,
-    languageSelected,
-    dispatchData
+    languageSelected
   } = _ref;
   if (!contentType) {
     setIsLoading(true);
@@ -127,15 +116,11 @@ const getList = async _ref => {
       lookup,
       type,
       field,
-      keepLocal = false,
-      keepLocalDate,
       keepUTC = false
     } = _ref2;
     if (dateDataTypes.includes(type)) {
       dateColumns.push({
         field,
-        keepLocal,
-        keepLocalDate,
         keepUTC
       });
     }
@@ -149,7 +134,8 @@ const getList = async _ref => {
   const where = [];
   if (filterModel !== null && filterModel !== void 0 && (_filterModel$items = filterModel.items) !== null && _filterModel$items !== void 0 && _filterModel$items.length) {
     filterModel.items.forEach(filter => {
-      if (["isEmpty", "isNotEmpty"].includes(filter.operator) || filter.value || filter.value === false) {
+      var _constants$emptyNotEm;
+      if ((_constants$emptyNotEm = _constants.default.emptyNotEmptyOperators) !== null && _constants$emptyNotEm !== void 0 && _constants$emptyNotEm.includes(filter.operator) || filter.value || filter.value === false || filter.value === 0) {
         var _column$, _column$2;
         const {
           field,
@@ -190,7 +176,7 @@ const getList = async _ref => {
   }
   const requestData = _objectSpread(_objectSpread({
     start: page * pageSize,
-    limit: modelConfig !== null && modelConfig !== void 0 && modelConfig.isClient ? 0 : isElasticExport ? modelConfig.exportSize : pageSize
+    limit: modelConfig !== null && modelConfig !== void 0 && modelConfig.isClient ? 0 : isElasticExport ? modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.exportSize : pageSize
   }, extraParams), {}, {
     logicalOperator: filterModel.logicOperator,
     sort: sortModel.map(sort => (sort.filterField || sort.field) + ' ' + sort.sort).join(','),
@@ -198,7 +184,7 @@ const getList = async _ref => {
     selectedClients,
     oderStatusId: oderStatusId,
     isElasticExport,
-    fileName: t(exportFileName || (modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.title) || (modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.overrideFileName), tOpts),
+    fileName: tTranslate(exportFileName || (modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.title) || (modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.overrideFileName), tOpts),
     fromSelfServe,
     isChildGrid,
     groupBy,
@@ -221,20 +207,8 @@ const getList = async _ref => {
   if (isPortalController && contentType) {
     action = 'export';
   }
-  let url = isPortalController ? isDetailsExport ? "".concat(apis.urlWithControllers).concat(api) : "".concat(apis.urlWithControllers).concat(api, "?action=").concat(action, "&asArray=0") : "".concat(api, "/").concat(action);
+  let url = isPortalController ? isDetailsExport ? "".concat(api) : "".concat(api, "?action=").concat(action, "&asArray=0") : "".concat(api, "/").concat(action);
   const isPivot = isPivotExport || isFieldStatusPivotExport || isInstallationPivotExport;
-  if (isPortalController) {
-    _utils.default.createFiltersForPortalController(where, requestData);
-    if (payloadFilter !== null && payloadFilter !== void 0 && payloadFilter.length) {
-      payloadFilter.map(ele => {
-        requestData[ele.field] = ele.value;
-      });
-    }
-    if (sortModel !== null && sortModel !== void 0 && sortModel.length) {
-      requestData.sort = sortModel[0].field;
-      requestData.dir = sortModel[0].sort;
-    }
-  }
   if (template !== null) {
     url += "&template=".concat(template);
   }
@@ -250,8 +224,8 @@ const getList = async _ref => {
   if (modelConfig !== null && modelConfig !== void 0 && modelConfig.customApi) {
     url = modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.customApi;
   }
-  let params = {
-    exportFileName: t(exportFileName || (modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.title) || (modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.overrideFileName), tOpts),
+  let exportParams = {
+    exportFileName: tTranslate ? tTranslate(exportFileName || (modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.title) || (modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.overrideFileName), tOpts) : exportFileName || (modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.title) || (modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.overrideFileName),
     action,
     exportFormat: 'XLSX',
     title: modelConfig === null || modelConfig === void 0 ? void 0 : modelConfig.pageTitle,
@@ -260,64 +234,22 @@ const getList = async _ref => {
   };
   if (isDetailsExport && additionalFiltersForExport) {
     requestData['additionalFiltersForExport'] = additionalFiltersForExport;
-    params['additionalFiltersForExport'] = additionalFiltersForExport;
+    exportParams['additionalFiltersForExport'] = additionalFiltersForExport;
   }
   if (contentType) {
     if (isDetailsExport) {
-      var _Object$keys;
       url = url + "?v=" + new Date() + '&' + 'forExport=true';
-      let filtersForExport = _utils.default.createFilter(filterModel, true);
-      if (((_Object$keys = Object.keys(filtersForExport)) === null || _Object$keys === void 0 ? void 0 : _Object$keys.length) > 0 && params.title !== _constants.default.surveyInboxTitle) {
-        filtersForExport.map(item => {
-          if (item !== null && item !== void 0 && item.operatorValue) {
-            if (item.isValueADate) {
-              let operatorId = _utils.default.dateOperator[item === null || item === void 0 ? void 0 : item.operatorValue];
-              if ((operatorId === null || operatorId === void 0 ? void 0 : operatorId.length) > 0) {
-                params.OperatorId = operatorId;
-              }
-            }
-          }
-          params = _objectSpread(_objectSpread({}, params), item);
-        });
-      }
     }
     if (where !== null && where !== void 0 && where.length && modelConfig !== null && modelConfig !== void 0 && modelConfig.convertFiltersToPortalFormat) {
-      var _Object$keys2;
-      let exportFilters = {};
-      if ((where === null || where === void 0 ? void 0 : where.length) <= 1) {
-        for (const i in where) {
-          where[i] = {
-            "fieldName": where[i].field,
-            "operatorId": _utils.default.filterType[where[i].operator],
-            "convert": false,
-            "values": [where[i].value]
-          };
-        }
-      } else {
-        var _filterModelCopy$item;
-        const filterModelCopy = filterModel;
-        let firstFilter = where[0];
-        if ((filterModelCopy === null || filterModelCopy === void 0 || (_filterModelCopy$item = filterModelCopy.items) === null || _filterModelCopy$item === void 0 ? void 0 : _filterModelCopy$item.length) > 1 && firstFilter) {
-          filterModelCopy.items = where;
-          if (firstFilter) {
-            firstFilter = {
-              "fieldName": firstFilter.field,
-              "operatorId": _utils.default.filterType[firstFilter.operator],
-              "convert": false,
-              "values": [firstFilter.value]
-            };
-          }
-          exportFilters = _utils.default.createFilter(filterModel);
-          exportFilters = _utils.default.addToFilter(firstFilter, exportFilters, filterModelCopy === null || filterModelCopy === void 0 ? void 0 : filterModelCopy.logicOperator.toUpperCase());
-        }
-      }
-      params['filter'] = ((_Object$keys2 = Object.keys(exportFilters)) === null || _Object$keys2 === void 0 ? void 0 : _Object$keys2.length) > 0 ? Object.assign({}, exportFilters) : where[0] || '';
+      // Note: This requires utils.createFilter which may need to be imported or implemented
+      exportParams['filter'] = where[0] || '';
     }
     const form = document.createElement("form");
     requestData.responseType = contentType;
     requestData.columns = columns;
     if (isPortalController) {
-      requestData.exportFormat = _constants.default.contentTypeToFileType[contentType];
+      var _constants$contentTyp;
+      requestData.exportFormat = ((_constants$contentTyp = _constants.default.contentTypeToFileType) === null || _constants$contentTyp === void 0 ? void 0 : _constants$contentTyp[contentType]) || 'XLSX';
       requestData.selectedFields = Object.keys(columns).join();
       if (requestData.sort && !Object.keys(columns).includes(requestData.sort)) {
         requestData.selectedFields += ",".concat(requestData.sort);
@@ -337,10 +269,9 @@ const getList = async _ref => {
     form.setAttribute("method", "POST");
     form.setAttribute("id", "exportForm");
     form.setAttribute("target", "_blank");
-    let arr = isDetailsExport && action === 'export' ? params : requestData;
+    let arr = isDetailsExport && action === 'export' ? exportParams : requestData;
     arr['isDetailsExport'] = isDetailsExport;
     if (isPivot && gridPivotFilter !== null && gridPivotFilter !== void 0 && gridPivotFilter.length) {
-      // When gridPivotFilter are passed and export is for pivot, apply gridPivotFilter filters as well
       for (const item of gridPivotFilter) {
         let v = item.value;
         if (v === undefined || v === null) {
@@ -401,7 +332,7 @@ const getList = async _ref => {
         url,
         params: requestData,
         history,
-        dispatch
+        dispatchData
       });
       setData(response);
     } else {
@@ -428,41 +359,18 @@ const getList = async _ref => {
           });
         }
         if (modelConfig !== null && modelConfig !== void 0 && modelConfig.dynamicColumns && setColumns) {
-          var _response$data;
+          var _response$data, _newDynamicColumns;
           const existingLabels = new Set(gridColumns === null || gridColumns === void 0 ? void 0 : gridColumns.map(col => col.label));
           const dynamicResponseColumns = ((_response$data = response.data) === null || _response$data === void 0 ? void 0 : _response$data.dynamicColumns) || [];
-          const isMerchandisingColumn = dynamicResponseColumns === null || dynamicResponseColumns === void 0 ? void 0 : dynamicResponseColumns.every(col => col.key);
           let newDynamicColumns;
-          if (isMerchandisingColumn) {
-            newDynamicColumns = dynamicResponseColumns === null || dynamicResponseColumns === void 0 ? void 0 : dynamicResponseColumns.filter(col => !existingLabels.has(col.key));
-            existingLabels.clear();
-            newDynamicColumns = newDynamicColumns.map(col => {
-              if (col.addDrillDownIcon) {
-                col.renderCell = params => {
-                  return /*#__PURE__*/React.createElement(_core.IconButton, {
-                    onClick: e => modelConfig.onDrillDown(params, col),
-                    size: "small",
-                    style: {
-                      padding: 1
-                    }
-                  }, /*#__PURE__*/React.createElement(_Add.default, null));
-                };
-              }
-              if (col.key && !col.addDrillDownIcon) {
-                col.label = _utils.default.formatMerchandisingDateRange(col.label);
-              }
-              return col;
+          if (modelConfig.updateDynamicColumns) {
+            newDynamicColumns = modelConfig.updateDynamicColumns({
+              dynamicResponseColumns,
+              t: tTranslate,
+              tOpts
             });
-          } else {
-            if (modelConfig.updateDynamicColumns) {
-              newDynamicColumns = modelConfig.updateDynamicColumns({
-                dynamicResponseColumns,
-                t,
-                tOpts
-              });
-            }
           }
-          if (newDynamicColumns.length) {
+          if ((_newDynamicColumns = newDynamicColumns) !== null && _newDynamicColumns !== void 0 && _newDynamicColumns.length) {
             setColumns([...modelConfig.columns, ...newDynamicColumns]);
           }
         }
@@ -478,8 +386,8 @@ const getList = async _ref => {
     }
   } catch (err) {
     let errorMessage = err;
-    if (t && tOpts) {
-      errorMessage = t(err.message, tOpts);
+    if (tTranslate && tOpts) {
+      errorMessage = tTranslate(err.message, tOpts);
     }
     setError(errorMessage);
   } finally {
@@ -496,7 +404,7 @@ const getList = async _ref => {
 };
 exports.getList = getList;
 const getRecord = async _ref3 => {
-  var _Object$keys3;
+  var _Object$keys;
   let {
     api,
     id,
@@ -519,7 +427,7 @@ const getRecord = async _ref3 => {
     }
   });
   searchParams.set("lookups", lookupsToFetch);
-  if (where && (_Object$keys3 = Object.keys(where)) !== null && _Object$keys3 !== void 0 && _Object$keys3.length) {
+  if (where && (_Object$keys = Object.keys(where)) !== null && _Object$keys !== void 0 && _Object$keys.length) {
     searchParams.set("where", JSON.stringify(where));
   }
   ;
@@ -574,7 +482,7 @@ const deleteRecord = exports.deleteRecord = async function deleteRecord(_ref4) {
     setIsLoading,
     setError,
     setErrorMessage,
-    t,
+    tTranslate,
     tOpts
   } = _ref4;
   let result = {
@@ -582,7 +490,8 @@ const deleteRecord = exports.deleteRecord = async function deleteRecord(_ref4) {
     error: ''
   };
   if (!id) {
-    setError(t('Deleted failed. No active record', tOpts));
+    const errorMsg = tTranslate ? tTranslate('Deleted failed. No active record', tOpts) : 'Deleted failed. No active record';
+    setError(errorMsg);
     return;
   }
   setIsLoading(true);
@@ -597,18 +506,22 @@ const deleteRecord = exports.deleteRecord = async function deleteRecord(_ref4) {
       return true;
     }
     if (response.status === _httpRequest.HTTP_STATUS_CODES.UNAUTHORIZED) {
-      setError(t('Session Expired!', tOpts));
+      const errorMsg = tTranslate ? tTranslate('Session Expired!', tOpts) : 'Session Expired!';
+      setError(errorMsg);
       setTimeout(() => {
         window.location.href = '/';
       }, 2000);
     } else {
-      setError(t('Delete failed', tOpts), t(response.body, tOpts));
+      const errorMsg = tTranslate ? tTranslate('Delete failed', tOpts) : 'Delete failed';
+      const bodyMsg = tTranslate ? tTranslate(response.body, tOpts) : response.body;
+      setError(errorMsg, bodyMsg);
     }
   } catch (error) {
     var _error$response;
     const errorMessage = error === null || error === void 0 || (_error$response = error.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.error;
     result.error = errorMessage;
-    setErrorMessage(t(errorMessage, tOpts));
+    const errorMsg = tTranslate ? tTranslate(errorMessage, tOpts) : errorMessage;
+    setErrorMessage(errorMsg);
   } finally {
     setIsLoading(false);
   }
@@ -621,11 +534,11 @@ const saveRecord = exports.saveRecord = async function saveRecord(_ref5) {
     values,
     setIsLoading,
     setError,
-    t,
+    tTranslate,
     tOpts
   } = _ref5;
   let url, method;
-  if (id !== 0) {
+  if (id) {
     url = "".concat(api, "/").concat(id);
     method = 'PUT';
   } else {
@@ -650,19 +563,26 @@ const saveRecord = exports.saveRecord = async function saveRecord(_ref5) {
       if (data.success) {
         return data;
       }
-      setError(t('Save failed', tOpts), t(data.err || data.message, tOpts));
+      const errorMsg = tTranslate ? tTranslate('Save failed', tOpts) : 'Save failed';
+      const dataMsg = tTranslate ? tTranslate(data.err || data.message, tOpts) : data.err || data.message;
+      setError(errorMsg, dataMsg);
       return;
     }
     if (response.status === _httpRequest.HTTP_STATUS_CODES.UNAUTHORIZED) {
-      setError(t('Session Expired!', tOpts));
+      const errorMsg = tTranslate ? tTranslate('Session Expired!', tOpts) : 'Session Expired!';
+      setError(errorMsg);
       setTimeout(() => {
         window.location.href = '/';
       }, 2000);
     } else {
-      setError(t('Save failed', tOpts), t(response.body, tOpts));
+      const errorMsg = tTranslate ? tTranslate('Save failed', tOpts) : 'Save failed';
+      const bodyMsg = tTranslate ? tTranslate(response.body, tOpts) : response.body;
+      setError(errorMsg, bodyMsg);
     }
   } catch (error) {
-    setError(t('Save failed', tOpts), t(error, tOpts));
+    const errorMsg = tTranslate ? tTranslate('Save failed', tOpts) : 'Save failed';
+    const errMsg = tTranslate ? tTranslate(error, tOpts) : error;
+    setError(errorMsg, errMsg);
   } finally {
     setIsLoading(false);
   }

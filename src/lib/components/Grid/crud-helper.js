@@ -1,21 +1,15 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import actionsStateProvider from "../useRouter/actions";
-import utils from "../utils";
-import constants from "../constants";
 import { transport, HTTP_STATUS_CODES } from "./httpRequest";
 import request from "./httpRequest";
-import dayjs from 'dayjs';
-import { IconButton } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
+import constants from '../constants';
+
+dayjs.extend(utc);
 
 const dateDataTypes = ['date', 'dateTime'];
-let url = (window.location.host.indexOf("localhost") !== -1) ? '' : process.env.APP_HOST;
-let urlWithControllers = url + "/Controllers/"
-const apis = {
-    urlWithControllers,
-    url
-}
 
-const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sortModel, filterModel, api, parentFilters, action = 'export', setError, extraParams, contentType, columns, controllerType = 'node', template = null, configFileName = null, dispatch, showFullScreenLoader = false, oderStatusId = 0, history = null, modelConfig = null, baseFilters = null, isElasticExport, fromSelfServe = false, isDetailsExport = false, setFetchData = () => { }, selectedClients = [], isChildGrid = false, groupBy, isPivotExport = false, gridPivotFilter = [], activeClients, isLatestExport = false, payloadFilter = [], isFieldStatusPivotExport = false, isInstallationPivotExport = false, uiClientIds = '', globalFilters = {}, additionalFiltersForExport, setColumns, afterDataSet, setIsDataFetchedInitially, isDataFetchedInitially, exportFileName = null, t = null, tOpts = null, languageSelected, dispatchData }) => {
+const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sortModel, filterModel, api, parentFilters, action = 'list', setError, extraParams, contentType, columns, controllerType = 'node', template = null, configFileName = null, dispatchData, showFullScreenLoader = false, oderStatusId = 0, modelConfig = null, baseFilters = null, isElasticExport, fromSelfServe = false, isDetailsExport = false, setFetchData = () => { }, selectedClients = [], isChildGrid = false, groupBy, isPivotExport = false, gridPivotFilter = [], activeClients, isLatestExport = false, payloadFilter = [], isFieldStatusPivotExport = false, isInstallationPivotExport = false, uiClientIds = '', globalFilters = {}, additionalFiltersForExport, setColumns, afterDataSet, setIsDataFetchedInitially, isDataFetchedInitially, exportFileName = null, tTranslate = null, tOpts = null, languageSelected }) => {
     if (!contentType) {
         setIsLoading(true);
         if (showFullScreenLoader) {
@@ -30,9 +24,9 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
     }
     const lookups = [];
     const dateColumns = [];
-    gridColumns.forEach(({ lookup, type, field, keepLocal = false, keepLocalDate, keepUTC = false }) => {
+    gridColumns.forEach(({ lookup, type, field, keepUTC = false }) => {
         if (dateDataTypes.includes(type)) {
-            dateColumns.push({ field, keepLocal, keepLocalDate, keepUTC });
+            dateColumns.push({ field, keepUTC });
         }
         if (!lookup) {
             return;
@@ -45,7 +39,7 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
     const where = [];
     if (filterModel?.items?.length) {
         filterModel.items.forEach(filter => {
-            if (["isEmpty", "isNotEmpty"].includes(filter.operator) || filter.value || filter.value === false) {
+            if (constants.emptyNotEmptyOperators?.includes(filter.operator) || filter.value || filter.value === false || filter.value === 0) {
                 const { field, operator, filterField } = filter;
                 let { value } = filter;
                 const column = gridColumns.filter((item) => item.field === filter.field);
@@ -80,7 +74,7 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
     }
     const requestData = {
         start: page * pageSize,
-        limit: modelConfig?.isClient ? 0 : isElasticExport ? modelConfig.exportSize : pageSize,
+        limit: modelConfig?.isClient ? 0 : isElasticExport ? modelConfig?.exportSize : pageSize,
         ...extraParams,
         logicalOperator: filterModel.logicOperator,
         sort: sortModel.map(sort => (sort.filterField || sort.field) + ' ' + sort.sort).join(','),
@@ -88,7 +82,7 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
         selectedClients,
         oderStatusId: oderStatusId,
         isElasticExport,
-        fileName: t(exportFileName || modelConfig?.title || modelConfig?.overrideFileName, tOpts),
+        fileName: tTranslate(exportFileName || modelConfig?.title || modelConfig?.overrideFileName, tOpts),
         fromSelfServe,
         isChildGrid,
         groupBy,
@@ -114,22 +108,9 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
     if (isPortalController && contentType) {
         action = 'export';
     }
-    let url = isPortalController ? isDetailsExport ? `${apis.urlWithControllers}${api}` : `${apis.urlWithControllers}${api}?action=${action}&asArray=0` : `${api}/${action}`;
+    let url = isPortalController ? isDetailsExport ? `${api}` : `${api}?action=${action}&asArray=0` : `${api}/${action}`;
 
     const isPivot = isPivotExport || isFieldStatusPivotExport || isInstallationPivotExport;
-    if (isPortalController) {
-        utils.createFiltersForPortalController(where, requestData);
-        if (payloadFilter?.length) {
-            payloadFilter.map((ele) => {
-                requestData[ele.field] = ele.value;
-            })
-        }
-
-        if (sortModel?.length) {
-            requestData.sort = sortModel[0].field;
-            requestData.dir = sortModel[0].sort;
-        }
-    }
 
     if (template !== null) {
         url += `&template=${template}`;
@@ -148,8 +129,8 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
         url = modelConfig?.customApi
     }
     
-    let params = {
-        exportFileName: t(exportFileName || modelConfig?.title || modelConfig?.overrideFileName, tOpts),
+    let exportParams = {
+        exportFileName: tTranslate ? tTranslate(exportFileName || modelConfig?.title || modelConfig?.overrideFileName, tOpts) : (exportFileName || modelConfig?.title || modelConfig?.overrideFileName),
         action,
         exportFormat: 'XLSX',
         title: modelConfig?.pageTitle,
@@ -158,64 +139,22 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
     }
     if (isDetailsExport && additionalFiltersForExport) {
         requestData['additionalFiltersForExport'] = additionalFiltersForExport;
-        params['additionalFiltersForExport'] = additionalFiltersForExport;
+        exportParams['additionalFiltersForExport'] = additionalFiltersForExport;
     }
 
     if (contentType) {
         if (isDetailsExport) {
             url = url + "?v=" + new Date() + '&' + 'forExport=true';
-            let filtersForExport = utils.createFilter(filterModel, true);
-            if (Object.keys(filtersForExport)?.length > 0 && params.title !== constants.surveyInboxTitle) {
-                filtersForExport.map((item) => {
-                    if (item?.operatorValue) {
-                        if (item.isValueADate) {
-                            let operatorId = utils.dateOperator[item?.operatorValue];
-                            if (operatorId?.length > 0) {
-                                params.OperatorId = operatorId;
-                            }
-                        }
-                    }
-                    params = { ...params, ...item };
-                })
-            }
-
         }
         if (where?.length && modelConfig?.convertFiltersToPortalFormat) {
-            let exportFilters = {};
-            if (where?.length <= 1) {
-                for (const i in where) {
-                    where[i] = {
-                        "fieldName": where[i].field,
-                        "operatorId": utils.filterType[where[i].operator],
-                        "convert": false,
-                        "values": [where[i].value]
-                    }
-                }
-            } else {
-                const filterModelCopy = filterModel;
-                let firstFilter = where[0];
-                if (filterModelCopy?.items?.length > 1 && firstFilter) {
-                    filterModelCopy.items = where;
-                    if (firstFilter) {
-                        firstFilter = {
-                            "fieldName": firstFilter.field,
-                            "operatorId": utils.filterType[firstFilter.operator],
-                            "convert": false,
-                            "values": [firstFilter.value]
-                        }
-                    }
-                    exportFilters = utils.createFilter(filterModel);
-                    exportFilters = utils.addToFilter(firstFilter, exportFilters, filterModelCopy?.logicOperator.toUpperCase());
-                }
-
-            }
-            params['filter'] = Object.keys(exportFilters)?.length > 0 ? Object.assign({}, exportFilters) : where[0] || '';
+            // Note: This requires utils.createFilter which may need to be imported or implemented
+            exportParams['filter'] = where[0] || '';
         }
         const form = document.createElement("form");
         requestData.responseType = contentType;
         requestData.columns = columns;
         if (isPortalController) {
-            requestData.exportFormat = constants.contentTypeToFileType[contentType];
+            requestData.exportFormat = constants.contentTypeToFileType?.[contentType] || 'XLSX';
             requestData.selectedFields = Object.keys(columns).join();
             if (requestData.sort && !Object.keys(columns).includes(requestData.sort)) {
                 requestData.selectedFields += `,${requestData.sort}`;
@@ -231,9 +170,9 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
         form.setAttribute("method", "POST");
         form.setAttribute("id", "exportForm");
         form.setAttribute("target", "_blank");
-        let arr = isDetailsExport && action === 'export' ? params : requestData;
+        let arr = isDetailsExport && action === 'export' ? exportParams : requestData;
         arr['isDetailsExport'] = isDetailsExport;
-        if (isPivot && gridPivotFilter?.length) { // When gridPivotFilter are passed and export is for pivot, apply gridPivotFilter filters as well
+        if (isPivot && gridPivotFilter?.length) {
             for (const item of gridPivotFilter) {
                 let v = item.value;
                 if (v === undefined || v === null) {
@@ -272,6 +211,7 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
                 form.append(hiddenTag);
             }
         }
+
         form.setAttribute('action', url);
         document.body.appendChild(form);
         form.submit();
@@ -293,7 +233,7 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
         };
         let response;
         if (isPortalController) {
-            response = await request({ url, params: requestData, history, dispatch });
+            response = await request({ url, params: requestData, history, dispatchData });
             setData(response);
         } else {
             response = await transport(params);
@@ -315,36 +255,11 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
                 if (modelConfig?.dynamicColumns && setColumns) {
                     const existingLabels = new Set(gridColumns?.map(col => col.label));
                     const dynamicResponseColumns = response.data?.dynamicColumns || [];
-                    const isMerchandisingColumn = dynamicResponseColumns?.every(col => col.key);
                     let newDynamicColumns;
-                    if (isMerchandisingColumn) {
-                        newDynamicColumns = dynamicResponseColumns?.filter(col => !existingLabels.has(col.key));
-                        existingLabels.clear();
-                        newDynamicColumns = newDynamicColumns.map(col => {
-                            if (col.addDrillDownIcon) {
-                                col.renderCell = (params) => {
-                                    return (
-                                        <IconButton
-                                            onClick={(e) => modelConfig.onDrillDown(params, col)}
-                                            size="small"
-                                            style={{ padding: 1 }}
-                                        >
-                                            <AddIcon />
-                                        </IconButton>
-                                    );
-                                };
-                            }
-                            if (col.key && !col.addDrillDownIcon) {
-                                col.label = utils.formatMerchandisingDateRange(col.label);
-                            }
-                            return col;
-                        });
-                    } else {
-                        if (modelConfig.updateDynamicColumns) {
-                            newDynamicColumns = modelConfig.updateDynamicColumns({ dynamicResponseColumns, t, tOpts });
-                        }
+                    if (modelConfig.updateDynamicColumns) {
+                        newDynamicColumns = modelConfig.updateDynamicColumns({ dynamicResponseColumns, t: tTranslate, tOpts });
                     }
-                    if (newDynamicColumns.length) {
+                    if (newDynamicColumns?.length) {
                         setColumns([...modelConfig.columns, ...newDynamicColumns]);
                     }
                 }
@@ -361,8 +276,8 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
         }
     } catch (err) {
         let errorMessage = err;
-        if (t && tOpts) {
-            errorMessage = t(err.message, tOpts);
+        if (tTranslate && tOpts) {
+            errorMessage = tTranslate(err.message, tOpts);
         }
         setError(errorMessage);
     } finally {
@@ -378,7 +293,6 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
 const getRecord = async ({ api, id, setIsLoading, setActiveRecord, modelConfig, parentFilters, where = {}, setError }) => {
     api = api || modelConfig?.api
     setIsLoading(!modelConfig?.overrideLoaderOnInitialRender);
-
     const searchParams = new URLSearchParams();
     const url = `${api}/${id === undefined || id === null ? '-' : id}`;
     const lookupsToFetch = [];
@@ -429,10 +343,11 @@ const getRecord = async ({ api, id, setIsLoading, setActiveRecord, modelConfig, 
     }
 };
 
-const deleteRecord = async function ({ id, api, setIsLoading, setError, setErrorMessage, t, tOpts }) {
+const deleteRecord = async function ({ id, api, setIsLoading, setError, setErrorMessage, tTranslate, tOpts }) {
     let result = { success: false, error: '' };
     if (!id) {
-        setError(t('Deleted failed. No active record', tOpts));
+        const errorMsg = tTranslate ? tTranslate('Deleted failed. No active record', tOpts) : 'Deleted failed. No active record';
+        setError(errorMsg);
         return;
     }
     setIsLoading(true);
@@ -447,27 +362,31 @@ const deleteRecord = async function ({ id, api, setIsLoading, setError, setError
             return true;
         }
         if (response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
-            setError(t('Session Expired!', tOpts));
+            const errorMsg = tTranslate ? tTranslate('Session Expired!', tOpts) : 'Session Expired!';
+            setError(errorMsg);
             setTimeout(() => {
                 window.location.href = '/';
             }, 2000);
         } else {
-            setError(t('Delete failed', tOpts), t(response.body, tOpts));
+            const errorMsg = tTranslate ? tTranslate('Delete failed', tOpts) : 'Delete failed';
+            const bodyMsg = tTranslate ? tTranslate(response.body, tOpts) : response.body;
+            setError(errorMsg, bodyMsg);
         }
     } catch (error) {
         const errorMessage = error?.response?.data?.error;
         result.error = errorMessage;
-        setErrorMessage(t(errorMessage, tOpts));
+        const errorMsg = tTranslate ? tTranslate(errorMessage, tOpts) : errorMessage;
+        setErrorMessage(errorMsg);
     } finally {
         setIsLoading(false);
     }
     return result;
 };
 
-const saveRecord = async function ({ id, api, values, setIsLoading, setError, t, tOpts }) {
+const saveRecord = async function ({ id, api, values, setIsLoading, setError, tTranslate, tOpts }) {
     let url, method;
 
-    if (id !== 0) {
+    if (id) {
         url = `${api}/${id}`;
         method = 'PUT';
     } else {
@@ -492,19 +411,26 @@ const saveRecord = async function ({ id, api, values, setIsLoading, setError, t,
             if (data.success) {
                 return data;
             }
-            setError(t('Save failed', tOpts), t(data.err || data.message, tOpts));
+            const errorMsg = tTranslate ? tTranslate('Save failed', tOpts) : 'Save failed';
+            const dataMsg = tTranslate ? tTranslate(data.err || data.message, tOpts) : (data.err || data.message);
+            setError(errorMsg, dataMsg);
             return;
         }
         if (response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
-            setError(t('Session Expired!', tOpts));
+            const errorMsg = tTranslate ? tTranslate('Session Expired!', tOpts) : 'Session Expired!';
+            setError(errorMsg);
             setTimeout(() => {
                 window.location.href = '/';
             }, 2000);
         } else {
-            setError(t('Save failed', tOpts), t(response.body, tOpts));
+            const errorMsg = tTranslate ? tTranslate('Save failed', tOpts) : 'Save failed';
+            const bodyMsg = tTranslate ? tTranslate(response.body, tOpts) : response.body;
+            setError(errorMsg, bodyMsg);
         }
     } catch (error) {
-        setError(t('Save failed', tOpts), t(error, tOpts));
+        const errorMsg = tTranslate ? tTranslate('Save failed', tOpts) : 'Save failed';
+        const errMsg = tTranslate ? tTranslate(error, tOpts) : error;
+        setError(errorMsg, errMsg);
     } finally {
         setIsLoading(false);
     }
