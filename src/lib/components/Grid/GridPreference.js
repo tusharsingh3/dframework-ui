@@ -90,7 +90,7 @@ const GridPreferences = ({ t, model, gridRef, columns = [], setIsGridPreferenceF
     const [menuAnchorEl, setMenuAnchorEl] = useState();
     const [openPreferenceExistsModal, setOpenPreferenceExistsModal] = useState(false);
     const { Username } = stateData?.getUserData ? stateData.getUserData : {};
-    const preferences = stateData?.preferences?.filter(pref => pref.prefName !== 'Coolr Default');
+    const preferences = stateData?.preferences?.filter(pref => pref.prefName !== 'CoolR Default');
     const currentPreference = stateData?.currentPreference;
     const preferenceApi = stateData?.gridSettings?.permissions?.preferenceApi;
     const filterModel = useGridSelector(gridRef, gridFilterModelSelector);
