@@ -114,7 +114,11 @@ const CustomToolbar = function CustomToolbar(props) {
     tOpts: tOpts,
     handleExport: handleExport,
     showPivotExportBtn: model === null || model === void 0 ? void 0 : model.showPivotExportBtn,
-    showOnlyExcelExport: model.showOnlyExcelExport
+    showOnlyExcelExport: model.showOnlyExcelExport,
+    hideExcelExport: model.hideExcelExport,
+    hideXmlExport: model.hideXmlExport,
+    hideHtmlExport: model.hideHtmlExport,
+    hideJsonExport: model.hideJsonExport
   }), model.preferenceId && /*#__PURE__*/_react.default.createElement(_GridPreference.default, {
     t: t,
     gridRef: apiRef,

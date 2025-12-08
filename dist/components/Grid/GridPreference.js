@@ -35,7 +35,6 @@ var _reactI18next = require("react-i18next");
 var _httpRequest = _interopRequireDefault(require("./httpRequest"));
 var _StateProvider = require("../useRouter/StateProvider");
 var _actions = _interopRequireDefault(require("../useRouter/actions"));
-var _utils = _interopRequireDefault(require("../utils"));
 var _constants = _interopRequireDefault(require("../constants"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
@@ -112,7 +111,7 @@ const getGridColumnsFromRef = _ref => {
   };
 };
 const GridPreferences = _ref2 => {
-  var _stateData$gridSettin;
+  var _stateData$gridSettin, _preferences$filter;
   let {
     t,
     model,
@@ -440,6 +439,15 @@ const GridPreferences = _ref2 => {
     handleClose();
     setOpenDialog(false);
   };
+  const handleResetPreferences = async () => {
+    // Clear current preference for this model from Redux state
+    removeCurrentPreferenceName({
+      dispatchData,
+      model: preferenceName
+    });
+    // Apply default preference (this will reset all grid state)
+    await applyPreference(_constants.default.defaultPreferenceId);
+  };
   const onCellClick = async (cellParams, event, details) => {
     let action = cellParams.field === 'editAction' ? actionTypes.Edit : cellParams.field === 'deleteAction' ? actionTypes.Delete : null;
     if (cellParams.id === 0 && (action === actionTypes.Edit || action === actionTypes.Delete)) {
@@ -464,6 +472,40 @@ const GridPreferences = _ref2 => {
     }
   };
   const prefName = formik.values.prefName.trim();
+  if (gridColumns.findIndex(col => col.field === 'editAction') === -1 && (filteredPrefs === null || filteredPrefs === void 0 ? void 0 : filteredPrefs.length) > 0) {
+    gridColumns.push({
+      field: 'editAction',
+      type: 'actions',
+      headerName: '',
+      width: 20,
+      getActions: params => [/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
+        key: "edit",
+        icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
+          title: t('Edit', tOpts)
+        }, /*#__PURE__*/_react.default.createElement(_Edit.default, null)),
+        label: t('Edit', tOpts),
+        color: "primary",
+        onClick: () => handleEditClick(params)
+      })]
+    });
+  }
+  if (gridColumns.findIndex(col => col.field === 'deleteAction') === -1 && (filteredPrefs === null || filteredPrefs === void 0 ? void 0 : filteredPrefs.length) > 0) {
+    gridColumns.push({
+      field: 'deleteAction',
+      type: 'actions',
+      headerName: '',
+      width: 20,
+      getActions: params => [/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
+        key: "delete",
+        icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
+          title: t('Delete', tOpts)
+        }, /*#__PURE__*/_react.default.createElement(_Delete.default, null)),
+        label: t('Delete', tOpts),
+        color: "error",
+        onClick: () => handleDeleteClick(params)
+      })]
+    });
+  }
   return /*#__PURE__*/_react.default.createElement(_material.Box, null, /*#__PURE__*/_react.default.createElement(_material.Button, {
     id: "grid-preferences-btn",
     "aria-controls": menuAnchorEl ? 'basic-menu' : undefined,
@@ -506,7 +548,12 @@ const GridPreferences = _ref2 => {
     dense: true,
     divider: (preferences === null || preferences === void 0 ? void 0 : preferences.length) > 0,
     onClick: () => openModal(formTypes.Manage, false)
-  }, t('Manage Preferences', tOpts)), (preferences === null || preferences === void 0 ? void 0 : preferences.length) > 0 && (preferences === null || preferences === void 0 ? void 0 : preferences.map((ele, key) => {
+  }, t('Manage Preferences', tOpts)), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
+    component: _material.ListItemButton,
+    dense: true,
+    divider: (preferences === null || preferences === void 0 ? void 0 : preferences.length) > 0,
+    onClick: handleResetPreferences
+  }, t('Reset Preferences', tOpts)), (preferences === null || preferences === void 0 ? void 0 : preferences.length) > 0 && (preferences === null || preferences === void 0 || (_preferences$filter = preferences.filter(pref => pref.prefName !== 'Coolr Default')) === null || _preferences$filter === void 0 ? void 0 : _preferences$filter.map((ele, key) => {
     const {
       prefName,
       prefDesc,
@@ -631,24 +678,24 @@ const GridPreferences = _ref2 => {
       }
     },
     className: "pagination-fix",
-    onCellClick: onCellClick,
+    disablePivoting: true,
     columns: gridColumns,
-    pageSizeOptions: [5, 10, 20, 50, 100],
+    pageSizeOptions: _constants.default.pageSizeOptions,
+    disableColumnMenu: true,
     pagination: true,
-    rowCount: filteredPrefs.length,
-    rows: filteredPrefs,
-    getRowId: getGridRowId,
-    slots: {
-      headerFilterMenu: false
-    },
-    density: "compact",
-    disableDensitySelector: true,
-    apiRef: apiRef,
-    disableAggregation: true,
-    disableRowGrouping: true,
-    disableRowSelectionOnClick: true,
-    autoHeight: true,
     localeText: {
+      noRowsLabel: t("No rows", tOpts),
+      columnMenuManageColumns: t('Manage columns', tOpts),
+      columnMenuHideColumn: t('Hide column', tOpts),
+      pinToLeft: t('Pin to left', tOpts),
+      pinToRight: t('Pin to right', tOpts),
+      columnMenuLabel: t('Menu', tOpts),
+      filterPanelRemoveAll: t('Remove all', tOpts),
+      columnsPanelTextFieldLabel: t('Find column', tOpts),
+      columnsPanelTextFieldPlaceholder: t('Column title', tOpts),
+      columnsPanelShowAllButton: t('Show all', tOpts),
+      columnsPanelHideAllButton: t('Hide all', tOpts),
+      booleanCellTrueLabel: t('Yes', tOpts),
       toolbarColumnsLabel: t('Select columns', tOpts),
       toolbarExportLabel: t('Export', tOpts),
       booleanCellFalseLabel: t('No', tOpts),
@@ -662,7 +709,29 @@ const GridPreferences = _ref2 => {
         return "".concat(from, "\u2013").concat(to, " ").concat(t('of', tOpts), " ").concat(count);
       },
       toolbarQuickFilterLabel: t('Search', tOpts),
-      columnsManagementSearchTitle: t('Search', tOpts)
+      columnsManagementSearchTitle: t('Search', tOpts),
+      columnsManagementNoColumns: t('No columns', tOpts)
+    },
+    rowCount: filteredPrefs.length,
+    rows: filteredPrefs,
+    getRowId: getGridRowId,
+    slots: {
+      headerFilterMenu: false
+    },
+    density: "compact",
+    disableDensitySelector: true,
+    apiRef: apiRef,
+    disableAggregation: true,
+    disableRowGrouping: true,
+    disableRowSelectionOnClick: true,
+    rowSelection: false,
+    initialState: {
+      pagination: {
+        paginationModel: {
+          pageSize: _constants.default.defaultPageSize,
+          page: 0
+        }
+      }
     }
   })))), formType === formTypes.Manage && /*#__PURE__*/_react.default.createElement(_material.DialogActions, null, /*#__PURE__*/_react.default.createElement(_material.Button, {
     color: "error",

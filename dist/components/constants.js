@@ -25,6 +25,7 @@ const constants = {
     CSV: 'text/csv',
     EXCEL: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   },
+  defaultPreferenceId: 0,
   actionTypes: {
     Copy: "Copy",
     Edit: "Edit",
@@ -70,6 +71,7 @@ const constants = {
     PlanogramName: "PlanogramName",
     Status: "Status"
   },
-  defaultLanguage: 'en'
+  defaultLanguage: 'en',
+  defaultPageSize: 10
 };
 var _default = exports.default = constants;

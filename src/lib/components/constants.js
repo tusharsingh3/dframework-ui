@@ -6,6 +6,7 @@ const constants = {
         CSV: 'text/csv',
         EXCEL: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     },
+    defaultPreferenceId: 0,
     actionTypes: {
         Copy: "Copy",
         Edit: "Edit",
@@ -52,6 +53,7 @@ const constants = {
         Status: "Status"
     },
     defaultLanguage: 'en',
+    defaultPageSize: 10
 }
 
 export default constants;

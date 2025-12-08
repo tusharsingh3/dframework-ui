@@ -13,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 import request from './httpRequest';
 import { useStateContext, useRouter } from '../useRouter/StateProvider';
 import actionsStateProvider from '../useRouter/actions';
-import utils from '../utils';
 import constants from '../constants';
 
 const formTypes = {
@@ -323,6 +322,13 @@ const GridPreferences = ({ t, model, gridRef, columns = [], setIsGridPreferenceF
         setOpenDialog(false);
     }
 
+    const handleResetPreferences = async () => {
+        // Clear current preference for this model from Redux state
+        removeCurrentPreferenceName({ dispatchData, model: preferenceName });
+        // Apply default preference (this will reset all grid state)
+        await applyPreference(constants.defaultPreferenceId);
+    };
+    
     const onCellClick = async (cellParams, event, details) => {
         let action = cellParams.field === 'editAction' ? actionTypes.Edit : cellParams.field === 'deleteAction' ? actionTypes.Delete : null;
         if (cellParams.id === 0 && (action === actionTypes.Edit || action === actionTypes.Delete)) {
@@ -341,6 +347,41 @@ const GridPreferences = ({ t, model, gridRef, columns = [], setIsGridPreferenceF
     }
 
     const prefName = formik.values.prefName.trim();
+
+    if (gridColumns.findIndex(col => col.field === 'editAction') === -1 && filteredPrefs?.length > 0) {
+        gridColumns.push({
+            field: 'editAction',
+            type: 'actions',
+            headerName: '',
+            width: 20,
+            getActions: (params) => [
+                <GridActionsCellItem
+                    key="edit"
+                    icon={<Tooltip title={t('Edit', tOpts)}><EditIcon /></Tooltip>}
+                    label={t('Edit', tOpts)}
+                    color="primary"
+                    onClick={() => handleEditClick(params)}
+                />
+            ]
+        });
+    }
+    if (gridColumns.findIndex(col => col.field === 'deleteAction') === -1 && filteredPrefs?.length > 0) {
+        gridColumns.push({
+            field: 'deleteAction',
+            type: 'actions',
+            headerName: '',
+            width: 20,
+            getActions: (params) => [
+                <GridActionsCellItem
+                    key="delete"
+                    icon={<Tooltip title={t('Delete', tOpts)}><DeleteIcon /></Tooltip>}
+                    label={t('Delete', tOpts)}
+                    color="error"
+                    onClick={() => handleDeleteClick(params)}
+                />
+            ]
+        });
+    }
 
     return (
         <Box>
@@ -384,8 +425,11 @@ const GridPreferences = ({ t, model, gridRef, columns = [], setIsGridPreferenceF
                 <MenuItem component={ListItemButton} dense divider={preferences?.length > 0} onClick={() => openModal(formTypes.Manage, false)}>
                     {t('Manage Preferences', tOpts)}
                 </MenuItem>
+                <MenuItem component={ListItemButton} dense divider={preferences?.length > 0} onClick={handleResetPreferences}>
+                    {t('Reset Preferences', tOpts)}
+                </MenuItem>
 
-                {preferences?.length > 0 && preferences?.map((ele, key) => {
+                {preferences?.length > 0 && preferences?.filter(pref => pref.prefName !== 'Coolr Default')?.map((ele, key) => {
                     const { prefName, prefDesc, prefId } = ele;
                     return (
                         <MenuItem
@@ -511,10 +555,33 @@ const GridPreferences = ({ t, model, gridRef, columns = [], setIsGridPreferenceF
                                         }
                                     }}
                                     className="pagination-fix"
-                                    onCellClick={onCellClick}
+                                    disablePivoting={true}
                                     columns={gridColumns}
-                                    pageSizeOptions={[5, 10, 20, 50, 100]}
+                                    pageSizeOptions={constants.pageSizeOptions}
+                                    disableColumnMenu={true}
                                     pagination
+                                    localeText={{
+                                        noRowsLabel: t("No rows", tOpts),
+                                        columnMenuManageColumns: t('Manage columns', tOpts),
+                                        columnMenuHideColumn: t('Hide column', tOpts),
+                                        pinToLeft: t('Pin to left', tOpts),
+                                        pinToRight: t('Pin to right', tOpts),
+                                        columnMenuLabel: t('Menu', tOpts),
+                                        filterPanelRemoveAll: t('Remove all', tOpts),
+                                        columnsPanelTextFieldLabel: t('Find column', tOpts),
+                                        columnsPanelTextFieldPlaceholder: t('Column title', tOpts),
+                                        columnsPanelShowAllButton: t('Show all', tOpts),
+                                        columnsPanelHideAllButton: t('Hide all', tOpts),
+                                        booleanCellTrueLabel: t('Yes', tOpts),
+                                        toolbarColumnsLabel: t('Select columns', tOpts),
+                                        toolbarExportLabel: t('Export', tOpts),
+                                        booleanCellFalseLabel: t('No', tOpts),
+                                        paginationRowsPerPage: t('Rows per page', tOpts),
+                                        paginationDisplayedRows: ({ from, to, count }) => `${from}–${to} ${t('of', tOpts)} ${count}`,
+                                        toolbarQuickFilterLabel: t('Search', tOpts),
+                                        columnsManagementSearchTitle: t('Search', tOpts),
+                                        columnsManagementNoColumns: t('No columns', tOpts)
+                                    }}
                                     rowCount={filteredPrefs.length}
                                     rows={filteredPrefs}
                                     getRowId={getGridRowId}
@@ -527,15 +594,9 @@ const GridPreferences = ({ t, model, gridRef, columns = [], setIsGridPreferenceF
                                     disableAggregation={true}
                                     disableRowGrouping={true}
                                     disableRowSelectionOnClick={true}
-                                    autoHeight
-                                    localeText={{
-                                        toolbarColumnsLabel: t('Select columns', tOpts),
-                                        toolbarExportLabel: t('Export', tOpts),
-                                        booleanCellFalseLabel: t('No', tOpts),
-                                        paginationRowsPerPage: t('Rows per page', tOpts),
-                                        paginationDisplayedRows: ({ from, to, count }) => `${from}–${to} ${t('of', tOpts)} ${count}`,
-                                        toolbarQuickFilterLabel: t('Search', tOpts),
-                                        columnsManagementSearchTitle: t('Search', tOpts)
+                                    rowSelection={false}
+                                    initialState={{
+                                        pagination: { paginationModel: { pageSize: constants.defaultPageSize, page: 0 } }
                                     }}
                                 />
                             </Grid>
