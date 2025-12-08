@@ -311,7 +311,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     showInstallationPivotExportBtn = false,
     detailExportLabel = "Excel with Details",
     rowSelectionModel = undefined,
-    globalFiltersComponent = null,
+    GlobalFiltersComponent = null,
     customApplyFunction = null
   } = _ref2;
   const [paginationModel, setPaginationModel] = (0, _react.useState)({
