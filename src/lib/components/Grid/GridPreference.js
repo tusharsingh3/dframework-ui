@@ -428,14 +428,14 @@ const GridPreferences = ({ t, model, gridRef, columns = [], setIsGridPreferenceF
                 <MenuItem component={ListItemButton} dense onClick={() => openModal(formTypes.Add)}>
                     {t('Add Preference', tOpts)}
                 </MenuItem>
-                <MenuItem component={ListItemButton} dense divider={preferences?.length > 0} onClick={() => openModal(formTypes.Manage, false)}>
+                <MenuItem component={ListItemButton} dense onClick={() => openModal(formTypes.Manage, false)}>
                     {t('Manage Preferences', tOpts)}
                 </MenuItem>
                 <MenuItem component={ListItemButton} dense divider={preferences?.length > 0} onClick={handleResetPreferences}>
                     {t('Reset Preferences', tOpts)}
                 </MenuItem>
 
-                {preferences?.length > 0 && preferences?.filter(pref => pref.prefName !== 'Coolr Default')?.map((ele, key) => {
+                {preferences?.length > 0 && preferences?.filter(pref => pref.prefName !== 'CoolR Default')?.map((ele, key) => {
                     const { prefName, prefDesc, prefId } = ele;
                     return (
                         <MenuItem

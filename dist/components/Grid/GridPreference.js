@@ -568,14 +568,13 @@ const GridPreferences = _ref2 => {
   }, t('Add Preference', tOpts)), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
     component: _material.ListItemButton,
     dense: true,
-    divider: (preferences === null || preferences === void 0 ? void 0 : preferences.length) > 0,
     onClick: () => openModal(formTypes.Manage, false)
   }, t('Manage Preferences', tOpts)), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
     component: _material.ListItemButton,
     dense: true,
     divider: (preferences === null || preferences === void 0 ? void 0 : preferences.length) > 0,
     onClick: handleResetPreferences
-  }, t('Reset Preferences', tOpts)), (preferences === null || preferences === void 0 ? void 0 : preferences.length) > 0 && (preferences === null || preferences === void 0 || (_preferences$filter = preferences.filter(pref => pref.prefName !== 'Coolr Default')) === null || _preferences$filter === void 0 ? void 0 : _preferences$filter.map((ele, key) => {
+  }, t('Reset Preferences', tOpts)), (preferences === null || preferences === void 0 ? void 0 : preferences.length) > 0 && (preferences === null || preferences === void 0 || (_preferences$filter = preferences.filter(pref => pref.prefName !== 'CoolR Default')) === null || _preferences$filter === void 0 ? void 0 : _preferences$filter.map((ele, key) => {
     const {
       prefName,
       prefDesc,

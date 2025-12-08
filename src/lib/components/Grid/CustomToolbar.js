@@ -60,7 +60,7 @@ const CustomToolbar = function (props) {
                     {effectivePermissions?.filter && <GridToolbarFilterButton />}
                     {effectivePermissions?.filter && <Button startIcon={<FilterListOffIcon />} onClick={clearFilters} size="small" sx={{ width: 'max-content' }}>{t("CLEAR FILTER", tOpts)}</Button>}
                     {effectivePermissions.export && (
-                        <CustomExportButton t={t} tOpts={tOpts} handleExport={handleExport} showPivotExportBtn={model?.showPivotExportBtn} showOnlyExcelExport={model.showOnlyExcelExport} hideExcelExport={model.hideExcelExport} hideXmlExport={model.hideXmlExport} hideHtmlExport={model.hideHtmlExport} hideJsonExport={model.hideJsonExport} />
+                        <CustomExportButton t={t} tOpts={tOpts} handleExport={handleExport} showPivotExportBtn={model?.showPivotExportBtn} showOnlyExcelExport={model.showOnlyExcelExport} hideExcelExport={hideExcelExport} hideXmlExport={hideXmlExport} hideHtmlExport={hideHtmlExport} hideJsonExport={hideJsonExport} />
                     )}
                     {model.preferenceId &&
                        <GridPreferences t={t} gridRef={apiRef} columns={gridColumns} setIsGridPreferenceFetched={setIsGridPreferenceFetched} model={model} initialGridRef={initialGridRef} setIsLoading={setIsLoading} />
