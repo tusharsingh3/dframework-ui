@@ -1250,11 +1250,33 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       fetchData(isPivotExport ? 'export' : undefined, undefined, e.target.dataset.contentType, columns, isPivotExport, isElasticScreen);
     }
   };
+
+  // Watch for changes in globalHeaderFilters and trigger data refresh
+  // We track both regular filters and groupBy separately to ensure both trigger refresh
+  const {
+    filteredGlobalFilters,
+    groupByField
+  } = (0, _react.useMemo)(() => {
+    if (!Array.isArray(globalHeaderFilters)) {
+      return {
+        filteredGlobalFilters: [],
+        groupByField: null
+      };
+    }
+
+    // Separate regular filters from groupBy (which has isGlobalSort flag)
+    const regularFilters = globalHeaderFilters.filter(f => !f.isGlobalSort);
+    const groupByFilter = globalHeaderFilters.find(f => f.isGlobalSort);
+    return {
+      filteredGlobalFilters: regularFilters,
+      groupByField: (groupByFilter === null || groupByFilter === void 0 ? void 0 : groupByFilter.field) || null
+    };
+  }, [globalHeaderFilters]);
   (0, _react.useEffect)(() => {
     if (isGridPreferenceFetched) {
       fetchData();
     }
-  }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, chartFilters, isGridPreferenceFetched, reRenderKey]);
+  }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, chartFilters, isGridPreferenceFetched, reRenderKey, filteredGlobalFilters, groupByField]);
   (0, _react.useEffect)(() => {
     if (forAssignment || !updatePageTitle) {
       return;

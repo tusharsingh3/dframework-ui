@@ -972,11 +972,29 @@ const GridBase = memo(({
             fetchData(isPivotExport ? 'export' : undefined, undefined, e.target.dataset.contentType, columns, isPivotExport, isElasticScreen);
         }
     };
+
+    // Watch for changes in globalHeaderFilters and trigger data refresh
+    // We track both regular filters and groupBy separately to ensure both trigger refresh
+    const { filteredGlobalFilters, groupByField } = useMemo(() => {
+        if (!Array.isArray(globalHeaderFilters)) {
+            return { filteredGlobalFilters: [], groupByField: null };
+        }
+        
+        // Separate regular filters from groupBy (which has isGlobalSort flag)
+        const regularFilters = globalHeaderFilters.filter((f) => !f.isGlobalSort);
+        const groupByFilter = globalHeaderFilters.find((f) => f.isGlobalSort);
+        
+        return {
+            filteredGlobalFilters: regularFilters,
+            groupByField: groupByFilter?.field || null
+        };
+    }, [globalHeaderFilters]);
+
     useEffect(() => {
         if (isGridPreferenceFetched) {
             fetchData();
         }
-    }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, chartFilters, isGridPreferenceFetched, reRenderKey])
+    }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, chartFilters, isGridPreferenceFetched, reRenderKey, filteredGlobalFilters, groupByField])
 
     useEffect(() => {
         if (forAssignment || !updatePageTitle) {
