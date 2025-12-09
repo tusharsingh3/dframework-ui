@@ -990,11 +990,25 @@ const GridBase = memo(({
         };
     }, [globalHeaderFilters]);
 
+    // Use stringified version of dependencies for deep comparison to avoid infinite loops
+    const globalFiltersString = JSON.stringify(filteredGlobalFilters);
+    const previousGlobalFiltersRef = useRef(globalFiltersString);
+    const previousGroupByRef = useRef(groupByField);
+
     useEffect(() => {
         if (isGridPreferenceFetched) {
+            // Only fetch if global filters or groupBy actually changed
+            const filtersChanged = previousGlobalFiltersRef.current !== globalFiltersString;
+            const groupByChanged = previousGroupByRef.current !== groupByField;
+            
+            if (filtersChanged || groupByChanged) {
+                previousGlobalFiltersRef.current = globalFiltersString;
+                previousGroupByRef.current = groupByField;
+            }
+            
             fetchData();
         }
-    }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, chartFilters, isGridPreferenceFetched, reRenderKey, filteredGlobalFilters, groupByField])
+    }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, chartFilters, isGridPreferenceFetched, reRenderKey, globalFiltersString, groupByField])
 
     useEffect(() => {
         if (forAssignment || !updatePageTitle) {

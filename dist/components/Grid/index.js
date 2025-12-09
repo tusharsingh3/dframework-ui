@@ -1272,11 +1272,23 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       groupByField: (groupByFilter === null || groupByFilter === void 0 ? void 0 : groupByFilter.field) || null
     };
   }, [globalHeaderFilters]);
+
+  // Use stringified version of dependencies for deep comparison to avoid infinite loops
+  const globalFiltersString = JSON.stringify(filteredGlobalFilters);
+  const previousGlobalFiltersRef = (0, _react.useRef)(globalFiltersString);
+  const previousGroupByRef = (0, _react.useRef)(groupByField);
   (0, _react.useEffect)(() => {
     if (isGridPreferenceFetched) {
+      // Only fetch if global filters or groupBy actually changed
+      const filtersChanged = previousGlobalFiltersRef.current !== globalFiltersString;
+      const groupByChanged = previousGroupByRef.current !== groupByField;
+      if (filtersChanged || groupByChanged) {
+        previousGlobalFiltersRef.current = globalFiltersString;
+        previousGroupByRef.current = groupByField;
+      }
       fetchData();
     }
-  }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, chartFilters, isGridPreferenceFetched, reRenderKey, filteredGlobalFilters, groupByField]);
+  }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, chartFilters, isGridPreferenceFetched, reRenderKey, globalFiltersString, groupByField]);
   (0, _react.useEffect)(() => {
     if (forAssignment || !updatePageTitle) {
       return;
