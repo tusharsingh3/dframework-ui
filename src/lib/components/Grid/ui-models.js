@@ -40,6 +40,11 @@ class UiModel {
     }
     this.columnVisibilityModel = columnVisibilityModel;
     this.defaultValues = defaultValues;
+    
+    // Store the updateColumnLabel function if provided
+    if (modelConfig.updateColumnLabelFunction) {
+      this.updateColumnLabelFunction = modelConfig.updateColumnLabelFunction;
+    }
   }
 
   getValidationSchema({ id }) {
@@ -111,6 +116,13 @@ class UiModel {
       <GridBase model={this} {...props} customStyle={customStyle} showRowsSelected={showRowsSelected} />
       <Divider orientation='horizontal' sx={{ mt: 2 }} />
     </>
+  }
+
+  updateColumnLabel(groupBy) {
+    // Default implementation - can be overridden by subclasses
+    if (this.columns && this.columns.length > 0 && this.updateColumnLabelFunction) {
+      this.columns[0].label = this.updateColumnLabelFunction(groupBy);
+    }
   }
 }
 

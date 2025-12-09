@@ -96,8 +96,7 @@ const getList = async _ref => {
     exportFileName = null,
     tTranslate = null,
     tOpts = null,
-    languageSelected,
-    formatMerchandisingDateRange = null
+    languageSelected
   } = _ref;
   if (!contentType) {
     setIsLoading(true);
@@ -373,6 +372,7 @@ const getList = async _ref => {
             newDynamicColumns = dynamicResponseColumns === null || dynamicResponseColumns === void 0 ? void 0 : dynamicResponseColumns.filter(col => !existingLabels.has(col.key));
             existingLabels.clear();
             newDynamicColumns = newDynamicColumns.map(col => {
+              var _model;
               if (col.addDrillDownIcon) {
                 col.renderCell = params => {
                   return /*#__PURE__*/React.createElement(_IconButton.default, {
@@ -384,9 +384,9 @@ const getList = async _ref => {
                   }, /*#__PURE__*/React.createElement(_Add.default, null));
                 };
               }
-              if (col.key && !col.addDrillDownIcon && formatMerchandisingDateRange) {
-                if (typeof formatMerchandisingDateRange === 'function') {
-                  col.label = formatMerchandisingDateRange(col.label);
+              if (col.key && !col.addDrillDownIcon && (_model = model) !== null && _model !== void 0 && _model.formatMerchandisingDateRange) {
+                if (typeof model.formatMerchandisingDateRange === 'function') {
+                  col.label = model.formatMerchandisingDateRange(col.label);
                 }
               }
               return col;

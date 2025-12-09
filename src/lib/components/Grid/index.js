@@ -161,6 +161,7 @@ const GridBase = memo(({
     where,
     customHeaderComponent,
     makeExternalRequest,
+    setColumns,
     showModal,
     OrderModal,
     permissions,
@@ -798,6 +799,7 @@ const GridBase = memo(({
             tTranslate,
             groupBy: model?.isPivotGrid ? [groupBy] : modelGroupBy,
             afterDataSet,
+            setColumns,
             setIsDataFetchedInitially,
             isDataFetchedInitially
         });

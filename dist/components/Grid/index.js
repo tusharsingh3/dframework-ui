@@ -284,6 +284,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     where,
     customHeaderComponent,
     makeExternalRequest,
+    setColumns,
     showModal,
     OrderModal,
     permissions,
@@ -1038,6 +1039,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       tTranslate,
       groupBy: model !== null && model !== void 0 && model.isPivotGrid ? [groupBy] : modelGroupBy,
       afterDataSet,
+      setColumns,
       setIsDataFetchedInitially,
       isDataFetchedInitially
     });

@@ -110,6 +110,11 @@ class UiModel {
     }
     this.columnVisibilityModel = columnVisibilityModel;
     this.defaultValues = defaultValues;
+
+    // Store the updateColumnLabel function if provided
+    if (modelConfig.updateColumnLabelFunction) {
+      this.updateColumnLabelFunction = modelConfig.updateColumnLabelFunction;
+    }
   }
   getValidationSchema(_ref3) {
     let {
@@ -179,6 +184,12 @@ class UiModel {
     }
     let validationSchema = yup.object(_objectSpread(_objectSpread({}, validationConfig), this.validationSchema));
     return validationSchema;
+  }
+  updateColumnLabel(groupBy) {
+    // Default implementation - can be overridden by subclasses
+    if (this.columns && this.columns.length > 0 && this.updateColumnLabelFunction) {
+      this.columns[0].label = this.updateColumnLabelFunction(groupBy);
+    }
   }
 }
 exports.UiModel = UiModel;
