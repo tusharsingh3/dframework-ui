@@ -226,13 +226,17 @@ const GridBase = memo(({
     const { pathname, navigate } = useRouter()
     const apiRef = useGridApiRef();
     const initialGridRef = useRef(null);
-    const { idProperty = "id", showHeaderFilters = true, disableRowSelectionOnClick = true, createdOnKeepLocal = true, hideBackButton = false, hideTopFilters = true, updatePageTitle = true, isElasticScreen = false, enablePivoting = false, showCreateButton, hideExcelExport = false, hideXmlExport = false, hideHtmlExport = false, hideJsonExport = false } = model;
+    const { idProperty = "id", showHeaderFilters = true, disableRowSelectionOnClick = true, createdOnKeepLocal = true, hideBackButton = false, hideTopFilters = true, updatePageTitle = true, isElasticScreen = false, enablePivoting = false, showCreateButton, hideExcelExport = false, hideXmlExport = false, hideHtmlExport = false, hideJsonExport = false, disableRowGrouping = true } = model;
     const isReadOnly = model.readOnly === true;
     const isDoubleClicked = model.doubleClicked === false;
     const customExportRef = useRef();
     const dataRef = useRef(data);
     const showAddIcon = model.showAddIcon === true;
-    const toLink = model.columns.map(item => item.link);
+    const toLink = model.columns.some(item => item.link === true);
+    const globalSort = globalHeaderFilters?.length ? globalHeaderFilters.filter(ele => ele.isGlobalSort) : [];
+    const [groupingModel, setGroupingModel] = useState([]);
+    const rowGroupBy = globalSort?.length ? [globalSort[0].field] : [''];
+    const groupingModelRef = useRef(null);
     const [isGridPreferenceFetched, setIsGridPreferenceFetched] = useState(false);
     const [columnOrderModel, setColumnOrderModel] = useState([]);
     const columnWidthsRef = useRef({});
@@ -302,6 +306,23 @@ const GridBase = memo(({
     useEffect(() => {
         dataRef.current = data;
     }, [data]);
+
+    // Handle Group By changes from global filters
+    useEffect(() => {
+        if (disableRowGrouping || !globalSort.length || groupingModelRef.current === globalSort[0].field) {
+            // Clear grouping if no globalSort and previously had grouping
+            if (!globalSort.length && groupingModelRef.current !== null) {
+                setGroupingModel([]);
+                setSortModel(convertDefaultSort(defaultSort || model?.defaultSort));
+                groupingModelRef.current = null;
+            }
+            return;
+        }
+        const { field, sort } = globalSort[0];
+        setGroupingModel([field]);
+        setSortModel([{ field: field, sort: sort }]);
+        groupingModelRef.current = field;
+    }, [JSON.stringify(globalSort), disableRowGrouping]);
 
     useEffect(() => {
 
@@ -451,6 +472,12 @@ const GridBase = memo(({
             if (column.link) {
                 overrides.cellClassName = "mui-grid-linkColumn";
             }
+            // Enable row grouping for columns when not disabled
+            if (!disableRowGrouping) {
+                overrides.groupable = column.groupable;
+            }
+            // Disable filtering for the currently grouped column
+            overrides.filterable = column.filterable === false ? false : (column.field !== groupingModelRef.current);
             finalColumns.push({ headerName: tTranslate(column.headerName || column.label, tOpts), ...column, ...overrides });
             if (column.pinned) {
                 pinnedColumns[column.pinned === 'right' ? 'right' : 'left'].push(column.field);
@@ -601,7 +628,7 @@ const GridBase = memo(({
         }
 
         return { gridColumns: finalColumns, pinnedColumns, lookupMap };
-    }, [columns, model, parent, permissions, forAssignment]);
+    }, [columns, model, parent, permissions, forAssignment, rowGroupBy]);
     const fetchData = (action = "list", extraParams = {}, contentType, columns, isPivotExport, isElasticExport) => {
         const { pageSize, page } = paginationModel;
         let gridApi = `${model.controllerType === 'cs' ? withControllersUrl : url}${model.api || api}`
@@ -973,8 +1000,8 @@ const GridBase = memo(({
         }
     };
 
-    // Filter out globalHeaderFilters with isGlobalSort flag (used for groupBy sorting)
-    // This matches the frontend implementation
+    // Filter out globalHeaderFilters with isGlobalSort flag from dependencies
+    // Group By changes are handled separately in their own useEffect to update groupingModel
     const filteredDependencies = useMemo(() => {
         const removeGlobalSort = Array.isArray(globalHeaderFilters) ? globalHeaderFilters.filter((f) => !f.isGlobalSort) : [];
         return removeGlobalSort;
@@ -1262,7 +1289,8 @@ const GridBase = memo(({
                         disableDensitySelector={true}
                         apiRef={apiRef}
                         disableAggregation={true}
-                        disableRowGrouping={true}
+                        disableRowGrouping={disableRowGrouping}
+                        rowGroupingModel={groupingModel}
                         disableRowSelectionOnClick={disableRowSelectionOnClick}
                         initialState={{
                             columns: {

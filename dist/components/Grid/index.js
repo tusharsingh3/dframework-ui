@@ -9,6 +9,7 @@ exports.default = void 0;
 require("core-js/modules/es.array.includes.js");
 require("core-js/modules/es.array.push.js");
 require("core-js/modules/es.array.reduce.js");
+require("core-js/modules/es.array.sort.js");
 require("core-js/modules/es.json.stringify.js");
 require("core-js/modules/es.object.assign.js");
 require("core-js/modules/es.parse-int.js");
@@ -24,6 +25,7 @@ require("core-js/modules/esnext.iterator.find.js");
 require("core-js/modules/esnext.iterator.for-each.js");
 require("core-js/modules/esnext.iterator.map.js");
 require("core-js/modules/esnext.iterator.reduce.js");
+require("core-js/modules/esnext.iterator.some.js");
 require("core-js/modules/esnext.json.parse.js");
 require("core-js/modules/esnext.set.difference.v2.js");
 require("core-js/modules/esnext.set.intersection.v2.js");
@@ -386,14 +388,19 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     hideExcelExport = false,
     hideXmlExport = false,
     hideHtmlExport = false,
-    hideJsonExport = false
+    hideJsonExport = false,
+    disableRowGrouping = true
   } = model;
   const isReadOnly = model.readOnly === true;
   const isDoubleClicked = model.doubleClicked === false;
   const customExportRef = (0, _react.useRef)();
   const dataRef = (0, _react.useRef)(data);
   const showAddIcon = model.showAddIcon === true;
-  const toLink = model.columns.map(item => item.link);
+  const toLink = model.columns.some(item => item.link === true);
+  const globalSort = globalHeaderFilters !== null && globalHeaderFilters !== void 0 && globalHeaderFilters.length ? globalHeaderFilters.filter(ele => ele.isGlobalSort) : [];
+  const [groupingModel, setGroupingModel] = (0, _react.useState)([]);
+  const rowGroupBy = globalSort !== null && globalSort !== void 0 && globalSort.length ? [globalSort[0].field] : [''];
+  const groupingModelRef = (0, _react.useRef)(null);
   const [isGridPreferenceFetched, setIsGridPreferenceFetched] = (0, _react.useState)(false);
   const [columnOrderModel, setColumnOrderModel] = (0, _react.useState)([]);
   const columnWidthsRef = (0, _react.useRef)({});
@@ -474,6 +481,29 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   (0, _react.useEffect)(() => {
     dataRef.current = data;
   }, [data]);
+
+  // Handle Group By changes from global filters
+  (0, _react.useEffect)(() => {
+    if (disableRowGrouping || !globalSort.length || groupingModelRef.current === globalSort[0].field) {
+      // Clear grouping if no globalSort and previously had grouping
+      if (!globalSort.length && groupingModelRef.current !== null) {
+        setGroupingModel([]);
+        setSortModel(convertDefaultSort(defaultSort || (model === null || model === void 0 ? void 0 : model.defaultSort)));
+        groupingModelRef.current = null;
+      }
+      return;
+    }
+    const {
+      field,
+      sort
+    } = globalSort[0];
+    setGroupingModel([field]);
+    setSortModel([{
+      field: field,
+      sort: sort
+    }]);
+    groupingModelRef.current = field;
+  }, [JSON.stringify(globalSort), disableRowGrouping]);
   (0, _react.useEffect)(() => {
     if (customFilters && Object.keys(customFilters) != 0) {
       if (customFilters.clear) {
@@ -634,6 +664,12 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       if (column.link) {
         overrides.cellClassName = "mui-grid-linkColumn";
       }
+      // Enable row grouping for columns when not disabled
+      if (!disableRowGrouping) {
+        overrides.groupable = column.groupable;
+      }
+      // Disable filtering for the currently grouped column
+      overrides.filterable = column.filterable === false ? false : column.field !== groupingModelRef.current;
       finalColumns.push(_objectSpread(_objectSpread({
         headerName: tTranslate(column.headerName || column.label, tOpts)
       }, column), overrides));
@@ -813,7 +849,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       pinnedColumns,
       lookupMap
     };
-  }, [columns, model, parent, permissions, forAssignment]);
+  }, [columns, model, parent, permissions, forAssignment, rowGroupBy]);
   const fetchData = function fetchData() {
     var _chartFilters$items, _model$globalFilters, _model$globalFilters2;
     let action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "list";
@@ -1251,8 +1287,8 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     }
   };
 
-  // Filter out globalHeaderFilters with isGlobalSort flag (used for groupBy sorting)
-  // This matches the frontend implementation
+  // Filter out globalHeaderFilters with isGlobalSort flag from dependencies
+  // Group By changes are handled separately in their own useEffect to update groupingModel
   const filteredDependencies = (0, _react.useMemo)(() => {
     const removeGlobalSort = Array.isArray(globalHeaderFilters) ? globalHeaderFilters.filter(f => !f.isGlobalSort) : [];
     return removeGlobalSort;
@@ -1571,7 +1607,8 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     disableDensitySelector: true,
     apiRef: apiRef,
     disableAggregation: true,
-    disableRowGrouping: true,
+    disableRowGrouping: disableRowGrouping,
+    rowGroupingModel: groupingModel,
     disableRowSelectionOnClick: disableRowSelectionOnClick,
     initialState: {
       columns: {
