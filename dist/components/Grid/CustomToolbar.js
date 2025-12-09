@@ -54,10 +54,6 @@ const CustomToolbar = function CustomToolbar(props) {
     showInstallationPivotExportBtn,
     detailExportLabel
   } = props;
-  console.log('preferenceData', {
-    id: model.preferenceId,
-    currentPreference
-  });
   const appliedPreference = currentPreference && currentPreference[model.preferenceId] ? currentPreference[model.preferenceId] : typeof currentPreference === 'string' ? currentPreference : '';
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "grid-header-alignment"

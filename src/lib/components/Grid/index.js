@@ -33,6 +33,7 @@ import CustomDropdownmenu from './CustomDropdownmenu';
 import { useTranslation } from 'react-i18next';
 import { GridOn, Code, Language, TableChart, DataObject as DataObjectIcon } from '@mui/icons-material';
 import Box from '@mui/material/Box';
+import { v4 as uuidv4 } from 'uuid';
 import utils from '../utils';
 import CustomToolbar from './CustomToolbar';
 import constants from '../constants';
@@ -198,7 +199,9 @@ const GridBase = memo(({
     HeaderFiltersComponent = null,
     updateParentFilters,
     renderField,
-    onDataLoaded
+    onDataLoaded,
+    gridExtraParams,
+    afterDataSet
 }) => {
     const [paginationModel, setPaginationModel] = useState({ pageSize: defaultPageSize, page: 0 });
     const [data, setData] = useState({ recordCount: 0, records: [], lookups: {} });
@@ -217,6 +220,7 @@ const GridBase = memo(({
     const isClient = model.isClient === true ? 'client' : 'server';
     const [errorMessage, setErrorMessage] = useState('');
     const [sortModel, setSortModel] = useState(convertDefaultSort(defaultSort || model?.defaultSort));
+    const [isDataFetchedInitially, setIsDataFetchedInitially] = useState(false);
     const initialFilterModel = { items: [], logicOperator: 'and', quickFilterValues: Array(0), quickFilterLogicOperator: 'and' }
     if (model.defaultFilters) {
         initialFilterModel.items = [];
@@ -750,6 +754,11 @@ const GridBase = memo(({
             extraParams.ClientId = clientsSelected.join(',');
         }
 
+        // Merge gridExtraParams into extraParams
+        if (gridExtraParams) {
+            Object.assign(extraParams, gridExtraParams);
+        }
+
         if (model.updateSortFields) {
             model.updateSortFields({ sort: sortModel, groupBy });
         }
@@ -787,7 +796,10 @@ const GridBase = memo(({
             globalFilters,
             tOpts,
             tTranslate,
-            groupBy: model?.isPivotGrid ? [groupBy] : modelGroupBy
+            groupBy: model?.isPivotGrid ? [groupBy] : modelGroupBy,
+            afterDataSet,
+            setIsDataFetchedInitially,
+            isDataFetchedInitially
         });
     };
     const openForm = (id, { mode } = {}) => {
@@ -1020,7 +1032,8 @@ const GridBase = memo(({
     }, [])
 
     const getGridRowId = (row) => {
-        return row[idProperty];
+        const idValue = row[idProperty];
+        return idValue && idValue.toString().trim() !== "" ? idValue : uuidv4();
     };
 
     const handleExport = (e) => {

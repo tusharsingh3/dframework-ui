@@ -15,6 +15,7 @@ require("core-js/modules/es.object.assign.js");
 require("core-js/modules/es.parse-int.js");
 require("core-js/modules/es.promise.js");
 require("core-js/modules/es.regexp.exec.js");
+require("core-js/modules/es.regexp.to-string.js");
 require("core-js/modules/es.string.ends-with.js");
 require("core-js/modules/es.string.includes.js");
 require("core-js/modules/es.string.replace.js");
@@ -60,6 +61,7 @@ var _CustomDropdownmenu = _interopRequireDefault(require("./CustomDropdownmenu")
 var _reactI18next = require("react-i18next");
 var _iconsMaterial = require("@mui/icons-material");
 var _Box = _interopRequireDefault(require("@mui/material/Box"));
+var _uuid = require("uuid");
 var _utils = _interopRequireDefault(require("../utils"));
 var _CustomToolbar = _interopRequireDefault(require("./CustomToolbar"));
 var _constants = _interopRequireDefault(require("../constants"));
@@ -320,7 +322,9 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     HeaderFiltersComponent = null,
     updateParentFilters,
     renderField,
-    onDataLoaded
+    onDataLoaded,
+    gridExtraParams,
+    afterDataSet
   } = _ref2;
   const [paginationModel, setPaginationModel] = (0, _react.useState)({
     pageSize: defaultPageSize,
@@ -358,6 +362,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   const isClient = model.isClient === true ? 'client' : 'server';
   const [errorMessage, setErrorMessage] = (0, _react.useState)('');
   const [sortModel, setSortModel] = (0, _react.useState)(convertDefaultSort(defaultSort || (model === null || model === void 0 ? void 0 : model.defaultSort)));
+  const [isDataFetchedInitially, setIsDataFetchedInitially] = (0, _react.useState)(false);
   const initialFilterModel = {
     items: [],
     logicOperator: 'and',
@@ -985,6 +990,11 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     if (clientsSelected && clientsSelected.length > 0 && model.isClient) {
       extraParams.ClientId = clientsSelected.join(',');
     }
+
+    // Merge gridExtraParams into extraParams
+    if (gridExtraParams) {
+      Object.assign(extraParams, gridExtraParams);
+    }
     if (model.updateSortFields) {
       model.updateSortFields({
         sort: sortModel,
@@ -1026,7 +1036,10 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       globalFilters,
       tOpts,
       tTranslate,
-      groupBy: model !== null && model !== void 0 && model.isPivotGrid ? [groupBy] : modelGroupBy
+      groupBy: model !== null && model !== void 0 && model.isPivotGrid ? [groupBy] : modelGroupBy,
+      afterDataSet,
+      setIsDataFetchedInitially,
+      isDataFetchedInitially
     });
   };
   const openForm = function openForm(id) {
@@ -1305,7 +1318,8 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     });
   }, []);
   const getGridRowId = row => {
-    return row[idProperty];
+    const idValue = row[idProperty];
+    return idValue && idValue.toString().trim() !== "" ? idValue : (0, _uuid.v4)();
   };
   const handleExport = e => {
     if ((data === null || data === void 0 ? void 0 : data.recordCount) > recordCounts) {

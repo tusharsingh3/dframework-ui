@@ -46,11 +46,7 @@ const CustomToolbar = function (props) {
         showInstallationPivotExportBtn,
         detailExportLabel
     } = props;
-
-    console.log('preferenceData', {
-        id: model.preferenceId,
-        currentPreference,
-    })
+    
     const appliedPreference = currentPreference && currentPreference[model.preferenceId] ? currentPreference[model.preferenceId] : typeof currentPreference === 'string' ? currentPreference : '';
 
     return (
