@@ -268,7 +268,7 @@ const convertDefaultSort = defaultSort => {
   return orderBy;
 };
 const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
-  var _stateData$gridSettin, _stateData$gridSettin2, _stateData$gridSettin3, _model$tTranslate, _stateData$gridSettin4, _model$globalFilters3;
+  var _stateData$gridSettin, _stateData$gridSettin2, _stateData$gridSettin3, _model$tTranslate, _stateData$gridSettin4, _apiRef$current2, _model$globalFilters3;
   let {
     useLinkColumn = true,
     model,
@@ -1230,6 +1230,18 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       setColumnOrderModel(prev => [...prev, ...newFields]);
     }
   }, [gridColumns, columnOrderModel.length]);
+
+  // Synchronize columnOrderModel with grid's orderedFields to maintain column order consistency
+  (0, _react.useEffect)(() => {
+    var _apiRef$current;
+    const gridOrderedFields = (_apiRef$current = apiRef.current) === null || _apiRef$current === void 0 || (_apiRef$current = _apiRef$current.state) === null || _apiRef$current === void 0 || (_apiRef$current = _apiRef$current.columns) === null || _apiRef$current === void 0 ? void 0 : _apiRef$current.orderedFields;
+    if (gridOrderedFields && Array.isArray(gridOrderedFields) && gridOrderedFields.length > 0) {
+      // Only update if different from current state to avoid unnecessary re-renders
+      if (JSON.stringify(gridOrderedFields) !== JSON.stringify(columnOrderModel)) {
+        setColumnOrderModel(gridOrderedFields);
+      }
+    }
+  }, [(_apiRef$current2 = apiRef.current) === null || _apiRef$current2 === void 0 || (_apiRef$current2 = _apiRef$current2.state) === null || _apiRef$current2 === void 0 || (_apiRef$current2 = _apiRef$current2.columns) === null || _apiRef$current2 === void 0 ? void 0 : _apiRef$current2.orderedFields, columnOrderModel]);
   (0, _react.useEffect)(() => {
     removeCurrentPreferenceName({
       dispatchData
@@ -1359,7 +1371,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     });
   }, [isLoading]);
   const handleColumnOrder = _ref6 => {
-    var _apiRef$current;
+    var _apiRef$current3;
     let {
       column,
       oldIndex,
@@ -1369,7 +1381,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     const newOrder = apiRef.current.getAllColumns().map(col => col.field);
     setColumnOrderModel(newOrder);
     // Also update the grid's internal orderedFields
-    if ((_apiRef$current = apiRef.current) !== null && _apiRef$current !== void 0 && (_apiRef$current = _apiRef$current.state) !== null && _apiRef$current !== void 0 && _apiRef$current.columns) {
+    if ((_apiRef$current3 = apiRef.current) !== null && _apiRef$current3 !== void 0 && (_apiRef$current3 = _apiRef$current3.state) !== null && _apiRef$current3 !== void 0 && _apiRef$current3.columns) {
       apiRef.current.state.columns.orderedFields = newOrder;
     }
   };
@@ -1451,7 +1463,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     setSortModel(sort);
   };
   const orderedColumns = (0, _react.useMemo)(() => {
-    var _apiRef$current2;
+    var _apiRef$current4;
     let columns = gridColumns;
 
     // Apply stored column widths from ref (only when grid re-renders)
@@ -1466,7 +1478,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     }
 
     // Apply column ordering from grid state (for preferences) or component state
-    const orderedFields = (_apiRef$current2 = apiRef.current) === null || _apiRef$current2 === void 0 || (_apiRef$current2 = _apiRef$current2.state) === null || _apiRef$current2 === void 0 || (_apiRef$current2 = _apiRef$current2.columns) === null || _apiRef$current2 === void 0 ? void 0 : _apiRef$current2.orderedFields;
+    const orderedFields = (_apiRef$current4 = apiRef.current) === null || _apiRef$current4 === void 0 || (_apiRef$current4 = _apiRef$current4.state) === null || _apiRef$current4 === void 0 || (_apiRef$current4 = _apiRef$current4.columns) === null || _apiRef$current4 === void 0 ? void 0 : _apiRef$current4.orderedFields;
     const orderToUse = orderedFields && Array.isArray(orderedFields) && orderedFields.length > 0 ? orderedFields : columnOrderModel;
 
     // If no order specified, return all columns

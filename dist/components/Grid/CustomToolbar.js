@@ -54,7 +54,7 @@ const CustomToolbar = function CustomToolbar(props) {
     showInstallationPivotExportBtn,
     detailExportLabel
   } = props;
-  console.log("currentpreference in toolbar:", currentPreference);
+  const appliedPreference = currentPreference && currentPreference[model.preferenceId] ? currentPreference[model.preferenceId] : currentPreference;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "grid-header-alignment"
   }, /*#__PURE__*/_react.default.createElement("div", {
@@ -66,7 +66,7 @@ const CustomToolbar = function CustomToolbar(props) {
     sx: {
       ml: 1
     }
-  }, " ", t(model.gridSubTitle, tOpts)), currentPreference && model.preferenceId && /*#__PURE__*/_react.default.createElement(_Typography.default, {
+  }, " ", t(model.gridSubTitle, tOpts)), appliedPreference && model.preferenceId && /*#__PURE__*/_react.default.createElement(_Typography.default, {
     className: "preference-name-text",
     variant: "h6",
     component: "h6",
@@ -74,7 +74,7 @@ const CustomToolbar = function CustomToolbar(props) {
     sx: {
       ml: 1
     }
-  }, " ", t(currentPreference, tOpts)), (isReadOnly || !(effectivePermissions !== null && effectivePermissions !== void 0 && effectivePermissions.add) && !forAssignment && !model.hideSubTitle) && /*#__PURE__*/_react.default.createElement(_Typography.default, {
+  }, " ", t(appliedPreference, tOpts)), (isReadOnly || !(effectivePermissions !== null && effectivePermissions !== void 0 && effectivePermissions.add) && !forAssignment && !model.hideSubTitle) && /*#__PURE__*/_react.default.createElement(_Typography.default, {
     variant: "h6",
     component: "h3",
     textAlign: "center",

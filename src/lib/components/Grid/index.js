@@ -967,6 +967,17 @@ const GridBase = memo(({
         }
     }, [gridColumns, columnOrderModel.length]);
 
+    // Synchronize columnOrderModel with grid's orderedFields to maintain column order consistency
+    useEffect(() => {
+        const gridOrderedFields = apiRef.current?.state?.columns?.orderedFields;
+        if (gridOrderedFields && Array.isArray(gridOrderedFields) && gridOrderedFields.length > 0) {
+            // Only update if different from current state to avoid unnecessary re-renders
+            if (JSON.stringify(gridOrderedFields) !== JSON.stringify(columnOrderModel)) {
+                setColumnOrderModel(gridOrderedFields);
+            }
+        }
+    }, [apiRef.current?.state?.columns?.orderedFields, columnOrderModel]);
+
     useEffect(() => {
         removeCurrentPreferenceName({ dispatchData });
         getAllSavedPreferences({ preferenceName: model.preferenceId, history: navigate, dispatchData, Username, preferenceApi });

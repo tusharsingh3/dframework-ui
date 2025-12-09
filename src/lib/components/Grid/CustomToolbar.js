@@ -47,14 +47,14 @@ const CustomToolbar = function (props) {
         detailExportLabel
     } = props;
 
-    console.log("currentpreference in toolbar:", currentPreference);
+    const appliedPreference = currentPreference && currentPreference[model.preferenceId] ? currentPreference[model.preferenceId] : currentPreference;
 
     return (
         <div className="grid-header-alignment" >
             <div className='grid-toolbar-heading'>
                 {model.hasCustomHeaderComponent && customHeaderComponent}
                 {model.gridSubTitle && <Typography variant="h6" component="h3" textAlign="center" sx={{ ml: 1 }}> {t(model.gridSubTitle, tOpts)}</Typography>}
-                {(currentPreference && model.preferenceId) && <Typography className="preference-name-text" variant="h6" component="h6" textAlign="center" sx={{ ml: 1 }} > {t(currentPreference, tOpts)}</Typography>}
+                {(appliedPreference && model.preferenceId) && <Typography className="preference-name-text" variant="h6" component="h6" textAlign="center" sx={{ ml: 1 }} > {t(appliedPreference, tOpts)}</Typography>}
                 {(isReadOnly || (!effectivePermissions?.add && !forAssignment) && !model.hideSubTitle) && <Typography variant="h6" component="h3" textAlign="center" sx={{ ml: 1 }} > {isReadOnly ? "" : t(model.title, tOpts)}</Typography>}
                 {!forAssignment && effectivePermissions?.add && !isReadOnly && !showCreateButton && (<Button startIcon={showAddIcon ? <AddIcon /> : null} onClick={onAdd} size="medium" variant="contained" className={classes.buttons} >{model?.customAddTextTitle ? t(model.customAddTextTitle, tOpts) : ` ${showAddIcon ? `${t("Add", tOpts)}` : ""} ${t(model.title, tOpts)}`}</Button>)}
                 {available && <Button startIcon={!showAddIcon ? null : <AddIcon />} onClick={onAssign} size="medium" variant="contained" className={classes.buttons}  >{t("Assign", tOpts)}</Button>}
