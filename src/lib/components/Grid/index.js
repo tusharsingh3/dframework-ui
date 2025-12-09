@@ -751,7 +751,7 @@ const GridBase = memo(({
         }
 
         if (model.updateSortFields) {
-            sortModel = model.updateSortFields({ sort: sortModel, groupBy });
+            model.updateSortFields({ sort: sortModel, groupBy });
         }
 
         if (model.updateFilterFields) {

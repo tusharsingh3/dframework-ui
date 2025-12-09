@@ -986,7 +986,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       extraParams.ClientId = clientsSelected.join(',');
     }
     if (model.updateSortFields) {
-      sortModel = model.updateSortFields({
+      model.updateSortFields({
         sort: sortModel,
         groupBy
       });
