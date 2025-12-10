@@ -1302,8 +1302,11 @@ const GridBase = memo(({
         }
 
         // Apply column ordering from grid state (for preferences) or component state
+        // After preferences are loaded, prefer the grid's orderedFields
         const orderedFields = apiRef.current?.state?.columns?.orderedFields;
-        const orderToUse = (orderedFields && Array.isArray(orderedFields) && orderedFields.length > 0) ? orderedFields : columnOrderModel;
+        const orderToUse = (isGridPreferenceFetched && orderedFields && Array.isArray(orderedFields) && orderedFields.length > 0) 
+            ? orderedFields 
+            : (columnOrderModel && columnOrderModel.length > 0 ? columnOrderModel : orderedFields);
 
         // If no order specified, return all columns
         if (!orderToUse || !Array.isArray(orderToUse) || !orderToUse.length) return columns;
@@ -1319,7 +1322,7 @@ const GridBase = memo(({
 
         // Return ordered columns + any missing columns at the end
         return [...orderedCols, ...missingCols];
-    }, [gridColumns, columnOrderModel]);
+    }, [gridColumns, columnOrderModel, isGridPreferenceFetched, apiRef.current?.state?.columns?.orderedFields]);
     const hideFooter = model.showFooter === false;
     return (
         <>

@@ -271,7 +271,7 @@ const convertDefaultSort = defaultSort => {
   return orderBy;
 };
 const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
-  var _stateData$gridSettin, _stateData$gridSettin2, _stateData$gridSettin3, _model$tTranslate, _stateData$gridSettin4, _model$globalFilters3;
+  var _stateData$gridSettin, _stateData$gridSettin2, _stateData$gridSettin3, _model$tTranslate, _stateData$gridSettin4, _apiRef$current4, _model$globalFilters3;
   let {
     useLinkColumn = true,
     model,
@@ -1635,8 +1635,9 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     }
 
     // Apply column ordering from grid state (for preferences) or component state
+    // After preferences are loaded, prefer the grid's orderedFields
     const orderedFields = (_apiRef$current3 = apiRef.current) === null || _apiRef$current3 === void 0 || (_apiRef$current3 = _apiRef$current3.state) === null || _apiRef$current3 === void 0 || (_apiRef$current3 = _apiRef$current3.columns) === null || _apiRef$current3 === void 0 ? void 0 : _apiRef$current3.orderedFields;
-    const orderToUse = orderedFields && Array.isArray(orderedFields) && orderedFields.length > 0 ? orderedFields : columnOrderModel;
+    const orderToUse = isGridPreferenceFetched && orderedFields && Array.isArray(orderedFields) && orderedFields.length > 0 ? orderedFields : columnOrderModel && columnOrderModel.length > 0 ? columnOrderModel : orderedFields;
 
     // If no order specified, return all columns
     if (!orderToUse || !Array.isArray(orderToUse) || !orderToUse.length) return columns;
@@ -1651,7 +1652,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
 
     // Return ordered columns + any missing columns at the end
     return [...orderedCols, ...missingCols];
-  }, [gridColumns, columnOrderModel]);
+  }, [gridColumns, columnOrderModel, isGridPreferenceFetched, (_apiRef$current4 = apiRef.current) === null || _apiRef$current4 === void 0 || (_apiRef$current4 = _apiRef$current4.state) === null || _apiRef$current4 === void 0 || (_apiRef$current4 = _apiRef$current4.columns) === null || _apiRef$current4 === void 0 ? void 0 : _apiRef$current4.orderedFields]);
   const hideFooter = model.showFooter === false;
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, (model === null || model === void 0 || (_model$globalFilters3 = model.globalFilters) === null || _model$globalFilters3 === void 0 || (_model$globalFilters3 = _model$globalFilters3.filterConfig) === null || _model$globalFilters3 === void 0 ? void 0 : _model$globalFilters3.length) && GlobalFiltersComponent && /*#__PURE__*/_react.default.createElement(GlobalFiltersComponent, {
     filterGroupByConfig: model.globalFilters,
