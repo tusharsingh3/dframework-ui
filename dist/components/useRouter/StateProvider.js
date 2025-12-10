@@ -118,6 +118,14 @@ const StateProvider = _ref => {
       gridRef.current.setPinnedColumns(userPreferenceCharts.pinnedColumns);
       gridRef.current.setSortModel(userPreferenceCharts.sortModel || []);
       gridRef.current.setFilterModel(userPreferenceCharts === null || userPreferenceCharts === void 0 ? void 0 : userPreferenceCharts.filterModel);
+
+      // Apply column order if available
+      if (userPreferenceCharts.columnOrder && Array.isArray(userPreferenceCharts.columnOrder)) {
+        const currentState = gridRef.current.state.columns;
+        if (currentState) {
+          currentState.orderedFields = userPreferenceCharts.columnOrder;
+        }
+      }
       dispatchData({
         type: _actions.default.SET_CURRENT_PREFERENCE_NAME,
         payload: response.prefName
@@ -131,6 +139,14 @@ const StateProvider = _ref => {
     if (setIsGridPreferenceFetched) {
       setIsGridPreferenceFetched(true);
     }
+
+    // Return the applied preference data for React state updates
+    return userPreferenceCharts ? {
+      sortModel: userPreferenceCharts.sortModel || [],
+      filterModel: userPreferenceCharts.filterModel,
+      columnOrder: userPreferenceCharts.columnOrder,
+      columnVisibilityModel: userPreferenceCharts.columnVisibilityModel
+    } : null;
   }
   function removeCurrentPreferenceName(_ref4) {
     let {
