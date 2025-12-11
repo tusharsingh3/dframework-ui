@@ -6,6 +6,7 @@ import request from "./httpRequest";
 import constants from '../constants';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
+import utils from '../utils';
 
 dayjs.extend(utc);
 
@@ -104,6 +105,22 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
     }
     if (modelConfig?.gridType) {
         requestData.gridType = modelConfig.gridType
+    }
+
+    // Transform filters for portal controller
+    if (isPortalController) {
+        utils.createFiltersForPortalController(where, requestData);
+
+        if (payloadFilter?.length) {
+            payloadFilter.map((ele) => {
+                requestData[ele.field] = ele.value;
+            });
+        }
+
+        if (sortModel?.length) {
+            requestData.sort = sortModel[0].field;
+            requestData.dir = sortModel[0].sort;
+        }
     }
 
     const headers = {};

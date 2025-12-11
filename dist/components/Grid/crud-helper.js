@@ -38,6 +38,7 @@ var _httpRequest = _interopRequireWildcard(require("./httpRequest"));
 var _constants = _interopRequireDefault(require("../constants"));
 var _IconButton = _interopRequireDefault(require("@mui/material/IconButton"));
 var _Add = _interopRequireDefault(require("@mui/icons-material/Add"));
+var _utils = _interopRequireDefault(require("../utils"));
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
@@ -205,6 +206,20 @@ const getList = async _ref => {
   }
   if (modelConfig !== null && modelConfig !== void 0 && modelConfig.gridType) {
     requestData.gridType = modelConfig.gridType;
+  }
+
+  // Transform filters for portal controller
+  if (isPortalController) {
+    _utils.default.createFiltersForPortalController(where, requestData);
+    if (payloadFilter !== null && payloadFilter !== void 0 && payloadFilter.length) {
+      payloadFilter.map(ele => {
+        requestData[ele.field] = ele.value;
+      });
+    }
+    if (sortModel !== null && sortModel !== void 0 && sortModel.length) {
+      requestData.sort = sortModel[0].field;
+      requestData.dir = sortModel[0].sort;
+    }
   }
   const headers = {};
   if (isPortalController && contentType) {

@@ -6,6 +6,7 @@ import {
     getGridDateOperators,
     GRID_CHECKBOX_SELECTION_COL_DEF,
     getGridStringOperators,
+    getGridNumericOperators,
 } from '@mui/x-data-grid-premium';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CopyIcon from '@mui/icons-material/FileCopy';
@@ -305,6 +306,9 @@ const GridBase = memo(({
         },
         "string": {
             "filterOperators": getGridStringOperators().filter(op => !['doesNotContain', 'doesNotEqual'].includes(op.value))
+        },
+        "number": {
+            "filterOperators": getGridNumericOperators().filter(op => !['!='].includes(op.value))
         },
         "date": {
             "valueFormatter": (value) => (
@@ -640,7 +644,7 @@ const GridBase = memo(({
                         }
 
                         // Assign action (last - only for custom actions)
-                        if (useCustomActions && modelPermissions.assign && onAssignmentClick) {
+                        if (useCustomActions && effectivePermissions.assign && onAssignmentClick) {
                             actions.push(
                                 <GridActionsCellItem
                                     key="assign"
@@ -1230,6 +1234,7 @@ const GridBase = memo(({
         const updatedItems = items.map(item => {
             const { field, operator, type, value } = item;
             const column = gridColumns.find(col => col.field === field);
+            const columnType = column?.type;
             const isNumber = column?.type === filterFieldDataTypes.Number;
 
             if (field === OrderSuggestionHistoryFields.OrderStatus) {
@@ -1247,10 +1252,11 @@ const GridBase = memo(({
                 } else {
                     item.filterField = null;
                 }
+                item.type = columnType;
                 return item;
             }
             const updatedValue = isNumber ? null : value;
-            return { field, operator, type, value: updatedValue };
+            return { field, operator, type: columnType, value: updatedValue };
         });
         e.items = updatedItems;
         setFilterModel(e);

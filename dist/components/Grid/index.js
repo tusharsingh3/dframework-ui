@@ -485,6 +485,9 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     "string": {
       "filterOperators": (0, _xDataGridPremium.getGridStringOperators)().filter(op => !['doesNotContain', 'doesNotEqual'].includes(op.value))
     },
+    "number": {
+      "filterOperators": (0, _xDataGridPremium.getGridNumericOperators)().filter(op => !['!='].includes(op.value))
+    },
     "date": {
       "valueFormatter": value => formatDate(value, true, false, stateData.dateTime),
       "filterOperators": (0, _LocalizedDatePicker.default)({
@@ -860,7 +863,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
             }
 
             // Assign action (last - only for custom actions)
-            if (useCustomActions && modelPermissions.assign && onAssignmentClick) {
+            if (useCustomActions && effectivePermissions.assign && onAssignmentClick) {
               actions.push(/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
                 key: "assign",
                 icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
@@ -1552,6 +1555,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
         value
       } = item;
       const column = gridColumns.find(col => col.field === field);
+      const columnType = column === null || column === void 0 ? void 0 : column.type;
       const isNumber = (column === null || column === void 0 ? void 0 : column.type) === filterFieldDataTypes.Number;
       if (field === OrderSuggestionHistoryFields.OrderStatus) {
         const {
@@ -1571,13 +1575,14 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
         } else {
           item.filterField = null;
         }
+        item.type = columnType;
         return item;
       }
       const updatedValue = isNumber ? null : value;
       return {
         field,
         operator,
-        type,
+        type: columnType,
         value: updatedValue
       };
     });
