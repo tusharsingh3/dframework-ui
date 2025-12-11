@@ -483,7 +483,7 @@ const GridBase = memo(({
                 let lookupFilters = [...getGridDateOperators(), ...getGridStringOperators()].filter((operator) => ['is', 'not', 'isAnyOf'].includes(operator.value))
                 overrides.filterOperators = lookupFilters.map((operator) => ({
                     ...operator,
-                    InputComponent: operator.InputComponent ? (params) => (
+                    InputComponent: (params) => (
                         <CustomDropdownmenu
                             column={{
                                 ...column,
@@ -492,7 +492,7 @@ const GridBase = memo(({
                             {...params}
                             autoHighlight
                         />
-                    ) : undefined
+                    )
                 }));
             }
             if (column.linkTo) {
