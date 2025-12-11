@@ -780,7 +780,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
             const actions = [];
 
             // Resolve action (first - only for custom actions)
-            if (useCustomActions && modelPermissions.resolve && onResolveClick) {
+            if (useCustomActions && effectivePermissions.resolve && onResolveClick) {
               actions.push(/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
                 key: "resolve",
                 icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
@@ -800,7 +800,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
             }
 
             // Delete action (second)
-            if (modelPermissions.delete) {
+            if (effectivePermissions.delete) {
               actions.push(/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
                 key: "delete",
                 icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
@@ -822,7 +822,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
             }
 
             // Copy action (third)
-            if (modelPermissions.add) {
+            if (effectivePermissions.add) {
               actions.push(/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
                 key: "copy",
                 icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
@@ -842,7 +842,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
             }
 
             // Edit action (fourth)
-            if (modelPermissions.edit) {
+            if (effectivePermissions.edit) {
               actions.push(/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
                 key: "edit",
                 icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
@@ -860,7 +860,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
             }
 
             // Assign action (last - only for custom actions)
-            if (useCustomActions && modelPermissions.assign && onAssignmentClick) {
+            if (useCustomActions && effectivePermissions.assign && onAssignmentClick) {
               actions.push(/*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
                 key: "assign",
                 icon: /*#__PURE__*/_react.default.createElement(_material.Tooltip, {

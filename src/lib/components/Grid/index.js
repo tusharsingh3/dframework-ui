@@ -572,7 +572,7 @@ const GridBase = memo(({
                         const actions = [];
 
                         // Resolve action (first - only for custom actions)
-                        if (useCustomActions && modelPermissions.resolve && onResolveClick) {
+                        if (useCustomActions && effectivePermissions.resolve && onResolveClick) {
                             actions.push(
                                 <GridActionsCellItem
                                     key="resolve"
@@ -588,7 +588,7 @@ const GridBase = memo(({
                         }
 
                         // Delete action (second)
-                        if (modelPermissions.delete) {
+                        if (effectivePermissions.delete) {
                             actions.push(
                                 <GridActionsCellItem
                                     key="delete"
@@ -608,7 +608,7 @@ const GridBase = memo(({
                         }
 
                         // Copy action (third)
-                        if (modelPermissions.add) {
+                        if (effectivePermissions.add) {
                             actions.push(
                                 <GridActionsCellItem
                                     key="copy"
@@ -624,7 +624,7 @@ const GridBase = memo(({
                         }
 
                         // Edit action (fourth)
-                        if (modelPermissions.edit) {
+                        if (effectivePermissions.edit) {
                             actions.push(
                                 <GridActionsCellItem
                                     key="edit"
@@ -640,7 +640,7 @@ const GridBase = memo(({
                         }
 
                         // Assign action (last - only for custom actions)
-                        if (useCustomActions && modelPermissions.assign && onAssignmentClick) {
+                        if (useCustomActions && effectivePermissions.assign && onAssignmentClick) {
                             actions.push(
                                 <GridActionsCellItem
                                     key="assign"
