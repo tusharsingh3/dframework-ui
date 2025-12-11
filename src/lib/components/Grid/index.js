@@ -1240,7 +1240,7 @@ const GridBase = memo(({
             const { field, operator, type, value } = item;
             const column = gridColumns.find(col => col.field === field);
             const columnType = column?.type;
-            const isNumber = column?.type === filterFieldDataTypes.Number || column?.type === filterFieldDataTypes.Numeric;
+            const isNumber = ['number', 'numeric'].includes(column?.type);
 
             if (field === OrderSuggestionHistoryFields.OrderStatus) {
                 const { filterField, ...newItem } = item;

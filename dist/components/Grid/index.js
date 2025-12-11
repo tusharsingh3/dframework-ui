@@ -1561,7 +1561,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       } = item;
       const column = gridColumns.find(col => col.field === field);
       const columnType = column === null || column === void 0 ? void 0 : column.type;
-      const isNumber = (column === null || column === void 0 ? void 0 : column.type) === filterFieldDataTypes.Number || (column === null || column === void 0 ? void 0 : column.type) === filterFieldDataTypes.Numeric;
+      const isNumber = ['number', 'numeric'].includes(column === null || column === void 0 ? void 0 : column.type);
       if (field === OrderSuggestionHistoryFields.OrderStatus) {
         const {
             filterField
