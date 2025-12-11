@@ -39,6 +39,7 @@ import utils from '../utils';
 import CustomToolbar from './CustomToolbar';
 import constants from '../constants';
 import ChildGridComponent from './ChildGridComponent';
+import { filter } from 'core-js/core/array';
 
 const defaultPageSize = 10;
 const t = utils.t;
@@ -277,6 +278,7 @@ const GridBase = memo(({
     const emptyIsAnyOfOperatorFilters = ["isEmpty", "isNotEmpty", "isAnyOf"];
     const filterFieldDataTypes = {
         Number: 'number',
+        Numeric: 'numeric',
         String: 'string',
         Boolean: 'boolean'
     };
@@ -308,6 +310,9 @@ const GridBase = memo(({
             "filterOperators": getGridStringOperators().filter(op => !['doesNotContain', 'doesNotEqual'].includes(op.value))
         },
         "number": {
+            "filterOperators": getGridNumericOperators().filter(op => !['!='].includes(op.value))
+        },
+        "numeric": {
             "filterOperators": getGridNumericOperators().filter(op => !['!='].includes(op.value))
         },
         "date": {
@@ -1235,7 +1240,7 @@ const GridBase = memo(({
             const { field, operator, type, value } = item;
             const column = gridColumns.find(col => col.field === field);
             const columnType = column?.type;
-            const isNumber = column?.type === filterFieldDataTypes.Number;
+            const isNumber = column?.type === filterFieldDataTypes.Number || column?.type === filterFieldDataTypes.Numeric;
 
             if (field === OrderSuggestionHistoryFields.OrderStatus) {
                 const { filterField, ...newItem } = item;

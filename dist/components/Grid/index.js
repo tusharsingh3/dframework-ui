@@ -66,6 +66,7 @@ var _utils = _interopRequireDefault(require("../utils"));
 var _CustomToolbar = _interopRequireDefault(require("./CustomToolbar"));
 var _constants = _interopRequireDefault(require("../constants"));
 var _ChildGridComponent = _interopRequireDefault(require("./ChildGridComponent"));
+var _array = require("core-js/core/array");
 const _excluded = ["row", "field", "id"],
   _excluded2 = ["filterField"];
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
@@ -454,6 +455,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   const emptyIsAnyOfOperatorFilters = ["isEmpty", "isNotEmpty", "isAnyOf"];
   const filterFieldDataTypes = {
     Number: 'number',
+    Numeric: 'numeric',
     String: 'string',
     Boolean: 'boolean'
   };
@@ -486,6 +488,9 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       "filterOperators": (0, _xDataGridPremium.getGridStringOperators)().filter(op => !['doesNotContain', 'doesNotEqual'].includes(op.value))
     },
     "number": {
+      "filterOperators": (0, _xDataGridPremium.getGridNumericOperators)().filter(op => !['!='].includes(op.value))
+    },
+    "numeric": {
       "filterOperators": (0, _xDataGridPremium.getGridNumericOperators)().filter(op => !['!='].includes(op.value))
     },
     "date": {
@@ -1556,7 +1561,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       } = item;
       const column = gridColumns.find(col => col.field === field);
       const columnType = column === null || column === void 0 ? void 0 : column.type;
-      const isNumber = (column === null || column === void 0 ? void 0 : column.type) === filterFieldDataTypes.Number;
+      const isNumber = (column === null || column === void 0 ? void 0 : column.type) === filterFieldDataTypes.Number || (column === null || column === void 0 ? void 0 : column.type) === filterFieldDataTypes.Numeric;
       if (field === OrderSuggestionHistoryFields.OrderStatus) {
         const {
             filterField
