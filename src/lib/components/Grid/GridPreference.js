@@ -40,7 +40,7 @@ const isValidForManagement = (pref) => {
         return false;
     }
     const prefNameLower = pref.prefName?.toLowerCase().trim();
-    if (prefNameLower === 'coolr default') {
+    if (prefNameLower === 'coolr default' || '') {
         return false;
     }
     return true
