@@ -342,7 +342,9 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     isClientSelected = true,
     showPivotExportBtn = false,
     CustomDialoModal,
-    ManageDataComponent
+    ManageDataComponent,
+    ChildGridComponent,
+    chartFilterFields
   } = _ref2;
   const [paginationModel, setPaginationModel] = (0, _react.useState)({
     pageSize: defaultPageSize,
@@ -934,7 +936,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
         columnField: field,
         operatorValue: operator
       } = chartFilters.items[0];
-      field = _constants.default.chartFilterFields[field];
+      field = chartFilterFields ? chartFilterFields[field] : field;
       const chartFilter = [{
         field: field,
         operator: operator,
@@ -1942,7 +1944,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
         borderBottom: 'none !important'
       }
     }
-  })), model !== null && model !== void 0 && model.childTabs ? /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_ChildGridComponent.default, {
+  })), model !== null && model !== void 0 && model.childTabs ? /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(ChildGridComponent, {
     tabs: model === null || model === void 0 ? void 0 : model.childTabs,
     selected: parentGridFilter,
     hideChildGrids: () => setShowChildGrids(false),

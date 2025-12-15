@@ -220,7 +220,9 @@ const GridBase = memo(({
     isClientSelected = true,
     showPivotExportBtn = false,
     CustomDialoModal,
-    ManageDataComponent
+    ManageDataComponent,
+    ChildGridComponent,
+    chartFilterFields
 }) => {
     const [paginationModel, setPaginationModel] = useState({ pageSize: defaultPageSize, page: 0 });
     const [data, setData] = useState({ recordCount: 0, records: [], lookups: {} });
@@ -690,7 +692,7 @@ const GridBase = memo(({
         let filters = { ...filterModel }, finalFilters = { ...filterModel };
         if (chartFilters?.items?.length > 0) {
             let { columnField: field, operatorValue: operator } = chartFilters.items[0];
-            field = constants.chartFilterFields[field];
+            field = chartFilterFields ? chartFilterFields[field] : field;
             const chartFilter = [{ field: field, operator: operator, isChartFilter: false }];
             filters.items = [...chartFilter];
             if (JSON.stringify(filterModel) !== JSON.stringify(filters)) {

@@ -49,15 +49,6 @@ const constants = {
         Decimal: 'decimal',
         Percentage: 'percentage'
     },
-    chartFilterFields: {
-        SerialNumber: "SerialNumber",
-        AssetType: "AssetType",
-        Code: "LocationCode",
-        MDMSerialNumber: "MDMSerialNumber",
-        SmartDeviceSerialNumber: "SmartDeviceSerialNumber",
-        PlanogramName: "PlanogramName",
-        Status: "Status"
-    },
     defaultLanguage: 'en',
     defaultPageSize: 10
 }
