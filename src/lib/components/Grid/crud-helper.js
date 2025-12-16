@@ -109,7 +109,7 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
 
     // Transform filters for portal controller
     if (isPortalController) {
-        utils.createFiltersForPortalController(where, requestData);
+        utils.createFormDataFilter(where, requestData);
 
         if (payloadFilter?.length) {
             payloadFilter.map((ele) => {

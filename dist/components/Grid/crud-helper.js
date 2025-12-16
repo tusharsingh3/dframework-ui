@@ -211,7 +211,7 @@ const getList = async _ref => {
 
   // Transform filters for portal controller
   if (isPortalController) {
-    _utils.default.createFiltersForPortalController(where, requestData);
+    _utils.default.createFormDataFilter(where, requestData);
     if (payloadFilter !== null && payloadFilter !== void 0 && payloadFilter.length) {
       payloadFilter.map(ele => {
         requestData[ele.field] = ele.value;

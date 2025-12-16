@@ -94,13 +94,13 @@ const utils = {
 	 *    { field: 'Status', type: 'string', value: 'active' },
 	 *    { fieldName: 'CreatedOn', type: 'date', value: ['2024-01-01','2024-12-31'] }
 	 *  ];
-	 *  utils.createFiltersForPortalController(where, params);
+	 *  utils.createFormDataFilter(where, params);
 	 *  // params now has portal-style filter keys ready to be sent in request
 	 * 
 	 * Returns:
 	 *   undefined if `where` is falsy or empty; otherwise, mutates `filterParams` in place.
 	 */
-	createFiltersForPortalController: function (where, filterParams = {}) {
+	createFormDataFilter: function (where, filterParams = {}) {
 		if (!where || !where.length) return;
 		where.forEach((ele, index) => {
 			if ((Array.isArray(ele.value) && ele.value?.length) || (!Array.isArray(ele.value) && ele.value)) {
